@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Icons/AED_GUI_Background.png</file>
+        <file>Icons/indicator_on.png</file>
+        <file>Icons/indicator_off.png</file>
+        <file>Icons/power_btn_on.png</file>
+        <file>Icons/power_btn_off.png</file>
+        <file>Icons/self_check_success.png</file>
+        <file>Icons/self_check_fail.png</file>
+    </qresource>
+</RCC>
