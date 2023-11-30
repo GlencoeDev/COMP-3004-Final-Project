@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include <QTimer>
+#include "defs.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,8 +37,18 @@ private:
 
     void powerOn();
     void powerOff();
+    void updateElapsedTime();
+    void resetElapsedTime();
 
     // Keep a list of the indicators shoing current AED operation step.
     QList<QLabel*> stepIndicators;
+
+    // Used to update the elapsed time.
+    QTimer* timeUpdateCounter;
+
+    // Saves elapsed time.
+    int elapsedTimeSec;
+
+    DeviceState state;
 };
-#endif // MAINWINDOW_H
+#endif

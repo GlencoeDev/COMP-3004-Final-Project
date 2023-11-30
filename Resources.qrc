@@ -7,5 +7,7 @@
         <file>Icons/power_btn_off.png</file>
         <file>Icons/self_check_success.png</file>
         <file>Icons/self_check_fail.png</file>
+        <file>Icons/attach_cpr_pads.png</file>
+        <file>Icons/detach_cpr_pads.png</file>
     </qresource>
 </RCC>

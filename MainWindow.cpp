@@ -2,11 +2,11 @@
 #include "ui_MainWindow.h"
 #include <QThread>
 #include <QTimer>
-#include "defs.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , state(OFF)
 {
     ui->setupUi(this);
 
@@ -30,8 +30,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set initial CPR depth.
     setCPRDepth(0.0);
-}
 
+    // Time-related code.
+    elapsedTimeSec = 0;
+    timeUpdateCounter = new QTimer(this);
+
+}
 
 MainWindow::~MainWindow()
 {
@@ -88,15 +92,34 @@ void MainWindow::powerOff()
 
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
+    // Reset timer and remove event listeners.
+    timeUpdateCounter->stop();
+
+    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
+
     // Initiate self-test after the start.
     if (checked)
     {
-        QTimer::singleShot(500, this, &MainWindow::selfTest);
+        state = ON;
+
+        QThread::msleep(500);
+        selfTest();
+
+        // Set up the time counter.
+        connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+        timeUpdateCounter->start(1000);
     }
     else
     {
+        state = OFF;
+
         // Turn off the self-test indicator.
         ui->selftCheckIndicator->setChecked(false);
+
+        // Set up a reset timer.
+        connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
+        timeUpdateCounter->start(5000);
     }
 }
 
@@ -141,4 +164,39 @@ void MainWindow::setCPRDepth(float depth)
     QApplication::processEvents();
 }
 
+void MainWindow::updateElapsedTime()
+{
+    // Do not update the timer if the device is off.
+    if (state == OFF) return;
 
+    elapsedTimeSec++;
+
+    // Find seconds and timer;
+    int seconds = elapsedTimeSec % 60;
+    int minutes = elapsedTimeSec / 60;
+
+    // Reset the timer if needed.
+    if (seconds == 59 && minutes == 59)
+    {
+        elapsedTimeSec = 0;
+        seconds = 0;
+        minutes = 0;
+    }
+
+    // Set the timer label.
+    QString timerStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
+    ui->elapsedTime->setText(timerStr);
+
+    QApplication::processEvents();
+}
+
+void MainWindow::resetElapsedTime()
+{
+    // This should be triggered only if the device was off for the last five minutes.
+    if (state == ON) return;
+
+    elapsedTimeSec = 0;
+    ui->elapsedTime->setText("00:00");
+
+    QApplication::processEvents();
+}
