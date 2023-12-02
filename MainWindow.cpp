@@ -39,6 +39,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->conditionSelector->setCurrentIndex(0);
     // Disable by default since patient is healthy by default.
     ui->numOfRunsSelector->setEnabled(false);
+
+    // Disable the stroke buttons.
+    // TODO: Only re-enable stroke buttons.
+    ui->shallowPushButton->setEnabled(false);
+    ui->deepPushButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -84,16 +89,6 @@ void MainWindow::turnOffIndicator(int index)
     QCoreApplication::processEvents();
 }
 
-void MainWindow::powerOn()
-{
-
-}
-
-void MainWindow::powerOff()
-{
-
-}
-
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
     // Reset timer and remove event listeners.
@@ -107,6 +102,10 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     {
         state = ON;
 
+        // Disable the patient condition selectors.
+        ui->conditionSelector->setEnabled(false);
+        ui->numOfRunsSelector->setEnabled(false);
+
         QThread::msleep(500);
         selfTest();
 
@@ -117,6 +116,10 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     else
     {
         state = OFF;
+
+        // Enable the patient condition selectors.
+        ui->conditionSelector->setEnabled(true);
+        ui->numOfRunsSelector->setEnabled(true);
 
         // Turn off the self-test indicator.
         ui->selftCheckIndicator->setChecked(false);
@@ -227,6 +230,10 @@ void MainWindow::on_shallowPushButton_clicked()
     setTextMsg(QString("Push harder"));
 }
 
+void MainWindow::updateBatteryLevel(int currentLevel)
+{
+    ui->batteryIndicator->setValue(currentLevel);
+}
 
 
 void MainWindow::on_deepPushButton_clicked()

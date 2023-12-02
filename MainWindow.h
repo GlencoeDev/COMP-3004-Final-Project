@@ -29,6 +29,9 @@ public slots:
     void setCPRDepth(float depth);
     void setTextMsg(const QString& msg);
 
+    // Updating battery indicator.
+    void updateBatteryLevel(int currentLevel);
+
 private slots:
     void on_powerBtn_toggled(bool checked);
 
@@ -41,8 +44,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    void powerOn();
-    void powerOff();
     void updateElapsedTime();
     void resetElapsedTime();
 
