@@ -220,3 +220,21 @@ void MainWindow::on_conditionSelector_currentIndexChanged(int index)
     }
 }
 
+
+void MainWindow::on_shallowPushButton_clicked()
+{
+    setCPRDepth(SHALLOW_PUSH);
+    setTextMsg(QString("Push harder"));
+}
+
+
+
+void MainWindow::on_deepPushButton_clicked()
+{
+    setCPRDepth(DEEP_PUSH);
+    setTextMsg(QString("Perfect stroke"));
+}
+
+void MainWindow::setTextMsg(const QString& msg){
+    ui -> textMsg -> setText(msg);
+}

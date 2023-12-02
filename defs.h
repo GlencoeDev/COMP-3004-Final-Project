@@ -3,8 +3,10 @@
 
 // Constants
 #define CM_PIX_RATIO 15.0
+#define SHALLOW_PUSH 5.0
+#define DEEP_PUSH 7.0
 
 // Device state.
-enum DeviceState { OFF, ON };
+enum AEDState { OFF, ON };
 
 #endif
