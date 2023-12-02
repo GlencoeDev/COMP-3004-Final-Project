@@ -10,11 +10,16 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    MainWindow.cpp
+    MainWindow.cpp \
+    AED.cpp
 
 HEADERS += \
     MainWindow.h \
-    defs.h
+    defs.h \
+    AED.h \
+    AEDState.h \
+    HeartState.h
+
 
 FORMS += \
     MainWindow.ui
