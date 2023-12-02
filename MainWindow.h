@@ -29,7 +29,6 @@ public slots:
     void setCPRDepth(float depth);
 
 private slots:
-
     void on_powerBtn_toggled(bool checked);
 
 private:
