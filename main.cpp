@@ -2,6 +2,7 @@
 #include "AED.h"
 
 #include <QApplication>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,9 @@ int main(int argc, char *argv[])
     // Create AED device.
     AED* device = new AED();
     w.addAED(device);
+
+
+    a.setStyle(QStyleFactory::create("Fusion"));
 
     w.show();
 
