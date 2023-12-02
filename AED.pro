@@ -16,9 +16,7 @@ SOURCES += \
 HEADERS += \
     MainWindow.h \
     defs.h \
-    AED.h \
-    AEDState.h \
-    HeartState.h
+    AED.h
 
 
 FORMS += \

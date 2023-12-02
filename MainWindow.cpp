@@ -2,11 +2,11 @@
 #include "ui_MainWindow.h"
 #include <QThread>
 #include <QTimer>
+#include "AED.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , state(OFF)
 {
     ui->setupUi(this);
 
@@ -51,6 +51,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::addAED(AED* device)
+{
+    if (device == nullptr) return;
+
+    this->device = device;
+}
 
 void MainWindow::selfTest()
 {
@@ -244,4 +250,9 @@ void MainWindow::on_deepPushButton_clicked()
 
 void MainWindow::setTextMsg(const QString& msg){
     ui -> textMsg -> setText(msg);
+}
+
+void MainWindow::setDeviceBatterySpecs()
+{
+
 }

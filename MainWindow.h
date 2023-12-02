@@ -4,11 +4,15 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
+#include <QList>
 #include "defs.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+
+class AED;
 
 class MainWindow : public QMainWindow
 {
@@ -20,6 +24,8 @@ public:
 
     /// Implements Power On Self-Test.
     void selfTest();
+
+    void addAED(AED* device);
 
 public slots:
     void turnOnIndicator(int index);
@@ -47,6 +53,9 @@ private:
     void updateElapsedTime();
     void resetElapsedTime();
 
+    // Set battery specs on the AED device.
+    void setDeviceBatterySpecs();
+
     // Keep a list of the indicators shoing current AED operation step.
     QList<QLabel*> stepIndicators;
 
@@ -56,6 +65,6 @@ private:
     // Saves elapsed time.
     int elapsedTimeSec;
 
-    AEDState state;
+    AED* device;
 };
 #endif

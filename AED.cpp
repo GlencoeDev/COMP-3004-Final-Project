@@ -4,18 +4,14 @@ const int AED::MAX_BATTERY_LEVEL = 100;
 const int AED::SUFFICIENT_BATTERY_LEVEL = 20;
 
 AED::AED()
-{
-    this->state = OFF;
-    this->batteryLevel = 100;
-    this->padsAttached = false;
-    this->patientHeartCondition = NORMAL;
-    this->shockCount = 0;
-}
+    : patientHeartCondition(NORMAL)
+    , state(OFF)
+    , padsAttached(false)
+    , batteryLevel(100)
+    , shockCount(0)
+{ }
 
-AED::~AED()
-{
-    // Nothing to do here.
-}
+AED::~AED() { }
 
 bool AED::selfTest()
 {
@@ -32,9 +28,6 @@ bool AED::selfTest()
         setState(STANDBY);
     }
 }
-
-
-
 
 void AED::startProcedure()
 {
@@ -147,4 +140,11 @@ void AED::setBatteryLevel(int batteryLevel)
     if(batteryLevel > MAX_BATTERY_LEVEL) this->batteryLevel = MAX_BATTERY_LEVEL;
     if(batteryLevel < 0) this->batteryLevel = 0;
     this->batteryLevel = batteryLevel;
+}
+
+void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle)
+{
+    batteryLevel = startingLevel;
+    batteryUnitsPerShock = unitsPerShock;
+    batteryUnitsWhenIdle = unitsWhenIdle;
 }

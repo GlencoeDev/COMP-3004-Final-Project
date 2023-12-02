@@ -7,14 +7,11 @@
 #ifndef AED_H
 #define AED_H
 
-#include "HeartState.h"
-#include "AEDState.h"
 #include "defs.h"
 
 class AED{
     public:
         AED();
-        AED(AEDState state, int batteryLevel, bool padsAttached, HeartState patientHeartCondition);
         ~AED();
         bool selfTest();
         void startProcedure();
@@ -37,6 +34,9 @@ class AED{
         void setPatientHeartCondition(HeartState patientHeartCondition);
         void setState(AEDState state);
         void setPadsAttached(bool padsAttached);
+
+        // Set bettery config prior to simulation.
+        void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     
     private:
         HeartState patientHeartCondition;
@@ -44,6 +44,10 @@ class AED{
         bool padsAttached;
         int batteryLevel;
         int shockCount;
+
+        // Indicate battery discharge for each operation.
+        int batteryUnitsPerShock = 5;
+        int batteryUnitsWhenIdle = 1;
 };
 
 #endif
