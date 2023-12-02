@@ -3,16 +3,17 @@
 #include <iostream>
 #include <QTextStream>
 #include <QTimer>
+#include <QObject>
 
 #ifndef AED_H
 #define AED_H
 
 #include "defs.h"
 
-class AED{
+class AED : public QObject{
+    Q_OBJECT
     public:
-        AED();
-        ~AED();
+        explicit AED();
         bool selfTest();
         void startProcedure();
         void chargeBattery();
@@ -23,7 +24,6 @@ class AED{
         void shock();
         void cancelShock();
         void startHeartRhythmAnalysis();
-
         // Getters
         HeartState getPatientHeartCondition() const;
         AEDState getState() const;
@@ -34,7 +34,8 @@ class AED{
         void setPatientHeartCondition(HeartState patientHeartCondition);
         void setState(AEDState state);
         void setPadsAttached(bool padsAttached);
-
+        void setShockUntilHealthy(int shockUntilHealthy);
+        void setBatteryLevel(int level);
         // Set bettery config prior to simulation.
         void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     
@@ -44,10 +45,14 @@ class AED{
         bool padsAttached;
         int batteryLevel;
         int shockCount;
-
+        //for simulation purpose.
+        int shockUntilHealthy;
         // Indicate battery discharge for each operation.
         int batteryUnitsPerShock = 5;
         int batteryUnitsWhenIdle = 1;
+    signals:
+        void stateChanged(AEDState state);
+        void batteryChanged(int level);
 };
 
 #endif

@@ -44,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: Only re-enable stroke buttons.
     ui->shallowPushButton->setEnabled(false);
     ui->deepPushButton->setEnabled(false);
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -56,6 +59,9 @@ void MainWindow::addAED(AED* device)
     if (device == nullptr) return;
 
     this->device = device;
+    //Conect signal and slot
+    connect(device, SIGNAL(stateChanged(AEDState)), this, SLOT(setCurrentState(AEDState)));
+    connect(device, SIGNAL(batteryChanged(int)), this, SLOT(updateBatteryLevel(int)));
 }
 
 void MainWindow::selfTest()
@@ -72,6 +78,10 @@ void MainWindow::selfTest()
         turnOffIndicator(i);
     }
     QThread::msleep(100);
+    if(!device -> selfTest()){
+        setTextMsg(QString("Self test fail!"));
+    }
+    setTextMsg(QString("Self test success, ready to use!"));
     ui->selftCheckIndicator->setChecked(true);
 }
 
@@ -97,6 +107,8 @@ void MainWindow::turnOffIndicator(int index)
 
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
+    if(device == nullptr)
+        return;
     // Reset timer and remove event listeners.
     timeUpdateCounter->stop();
 
@@ -106,27 +118,37 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     // Initiate self-test after the start.
     if (checked)
     {
-        state = ON;
 
+        device -> powerOn();
         // Disable the patient condition selectors.
         ui->conditionSelector->setEnabled(false);
         ui->numOfRunsSelector->setEnabled(false);
-
+        ui->batteryUnitLayout->setEnabled(false);
         QThread::msleep(500);
-        selfTest();
+
+
 
         // Set up the time counter.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
         timeUpdateCounter->start(1000);
+
+        // Set the battery spec for the device
+        setDeviceBatterySpecs();
+
+        // Set patient heart condition
+        setPatientCondition();
+
+        //Go into self test state
+        device -> setState(SELF_TEST);
     }
     else
     {
-        state = OFF;
+        device -> powerOff();
 
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
         ui->numOfRunsSelector->setEnabled(true);
-
+        ui->batteryUnitLayout->setEnabled(true);
         // Turn off the self-test indicator.
         ui->selftCheckIndicator->setChecked(false);
 
@@ -180,7 +202,7 @@ void MainWindow::setCPRDepth(float depth)
 void MainWindow::updateElapsedTime()
 {
     // Do not update the timer if the device is off.
-    if (state == OFF) return;
+    if (device -> getState() == OFF) return;
 
     elapsedTimeSec++;
 
@@ -206,7 +228,7 @@ void MainWindow::updateElapsedTime()
 void MainWindow::resetElapsedTime()
 {
     // This should be triggered only if the device was off for the last five minutes.
-    if (state == ON) return;
+    if (device -> getState() != OFF) return;
 
     elapsedTimeSec = 0;
     ui->elapsedTime->setText("00:00");
@@ -250,9 +272,57 @@ void MainWindow::on_deepPushButton_clicked()
 
 void MainWindow::setTextMsg(const QString& msg){
     ui -> textMsg -> setText(msg);
+    ui -> audioLabel -> setText(msg);
 }
 
 void MainWindow::setDeviceBatterySpecs()
 {
+    int startingValue = ui -> startingBatteryLevel -> value();
+    int batteryPerShock = ui -> batteryPerShock-> value();
+    int batteryWhenIdle = ui -> batteryWhenIdle -> value();
+    device -> setBatterySpecs(startingValue, batteryPerShock, batteryWhenIdle);
+}
+
+void MainWindow::setPatientCondition(){
+    int patientHeartCondition = ui -> conditionSelector -> currentIndex();
+    int numberOfShock = ui -> numOfRunsSelector -> value();
+    device -> setPatientHeartCondition((HeartState)patientHeartCondition);
+    device -> setShockUntilHealthy(numberOfShock);
+}
+
+void MainWindow::setCurrentState(AEDState state){
+    //Always disable CPR button unless in CPR state
+    ui -> shallowPushButton -> setDisabled(true);
+    ui -> deepPushButton -> setDisabled(true);
+    switch (state){
+        case OFF:
+
+        break;
+
+        case SELF_TEST:
+            selfTest();
+        break;
+
+        case STANDBY:
+            setTextMsg(QString("Stay away from the patient!"));
+        break;
+
+        case ANALYZING:
+            setTextMsg(QString("Analyzing the patient heart conditioni"));
+        break;
+
+        case CHARGING:
+            setTextMsg(QString("Charging for shock"));
+        break;
+
+        case CPR:
+            ui -> shallowPushButton -> setDisabled(false);
+            ui -> deepPushButton -> setDisabled(false);
+        break;
+
+        case SHOCKING:
+            setTextMsg(QString("Shocking the patient"));
+        break;
+    }
 
 }

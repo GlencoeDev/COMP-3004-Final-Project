@@ -10,5 +10,6 @@
         <file>Icons/attach_cpr_pads.png</file>
         <file>Icons/detach_cpr_pads.png</file>
         <file>Icons/patient.png</file>
+        <file>Icons/audioIcon.png</file>
     </qresource>
 </RCC>

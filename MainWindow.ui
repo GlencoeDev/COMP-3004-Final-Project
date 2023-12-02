@@ -381,7 +381,7 @@ border-radius: 0;</string>
           <x>640</x>
           <y>20</y>
           <width>121</width>
-          <height>28</height>
+          <height>33</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -528,7 +528,7 @@ border: 0;</string>
     <property name="geometry">
      <rect>
       <x>830</x>
-      <y>0</y>
+      <y>-10</y>
       <width>271</width>
       <height>915</height>
      </rect>
@@ -586,6 +586,7 @@ background: transparent;</string>
          <font>
           <family>Arial</family>
           <pointsize>18</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -758,6 +759,7 @@ border: 2px solid #8a8f9e;</string>
       <font>
        <family>Arial</family>
        <pointsize>16</pointsize>
+       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -778,7 +780,7 @@ color: black;</string>
        <height>112</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="batteryUnitLayout">
       <property name="spacing">
        <number>4</number>
       </property>
@@ -861,7 +863,7 @@ color: black;</string>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="numOfRunsSelector_3">
+          <widget class="QSpinBox" name="batteryWhenIdle">
            <property name="minimum">
             <number>1</number>
            </property>
@@ -905,13 +907,68 @@ color: black;</string>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="numOfRunsSelector_2">
+          <widget class="QSpinBox" name="batteryPerShock">
            <property name="minimum">
             <number>1</number>
            </property>
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>460</y>
+       <width>126</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 0;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="Resources.qrc">
+          <normaloff>:/Icons/audioIcon.png</normaloff>
+          <normalon>:/Icons/audioIcon.png</normalon>
+          <disabledoff>:/Icons/audioIcon.png</disabledoff>
+          <disabledon>:/Icons/audioIcon.png</disabledon>
+          <activeoff>:/Icons/audioIcon.png</activeoff>
+          <activeon>:/Icons/audioIcon.png</activeon>
+          <selectedoff>:/Icons/audioIcon.png</selectedoff>
+          <selectedon>:/Icons/audioIcon.png</selectedon>:/Icons/audioIcon.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="audioLabel">
+        <property name="styleSheet">
+         <string notr="true">border: 0;</string>
+        </property>
+        <property name="text">
+         <string>Audio Message</string>
+        </property>
        </widget>
       </item>
      </layout>

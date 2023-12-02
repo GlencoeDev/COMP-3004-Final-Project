@@ -37,7 +37,7 @@ public slots:
 
     // Updating battery indicator.
     void updateBatteryLevel(int currentLevel);
-
+    void setCurrentState(AEDState state);
 private slots:
     void on_powerBtn_toggled(bool checked);
 
@@ -47,6 +47,7 @@ private slots:
 
     void on_deepPushButton_clicked();
 
+
 private:
     Ui::MainWindow *ui;
 
@@ -55,7 +56,7 @@ private:
 
     // Set battery specs on the AED device.
     void setDeviceBatterySpecs();
-
+    void setPatientCondition();
     // Keep a list of the indicators shoing current AED operation step.
     QList<QLabel*> stepIndicators;
 

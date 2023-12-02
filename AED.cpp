@@ -1,22 +1,18 @@
 #include "AED.h"
 
-const int AED::MAX_BATTERY_LEVEL = 100;
-const int AED::SUFFICIENT_BATTERY_LEVEL = 20;
 
 AED::AED()
-    : patientHeartCondition(NORMAL)
+    :
+      QObject(nullptr)
+    , patientHeartCondition(NORMAL)
     , state(OFF)
     , padsAttached(false)
     , batteryLevel(100)
     , shockCount(0)
 { }
 
-AED::~AED() { }
-
 bool AED::selfTest()
 {
-    setState(SELF_TEST);
-
     if (this->batteryLevel < SUFFICIENT_BATTERY_LEVEL || !this->padsAttached )
     {
         return false;
@@ -28,7 +24,6 @@ bool AED::selfTest()
         setState(STANDBY);
     }
 }
-
 void AED::startProcedure()
 {
 // if electrodesare attached, go staright to analyzing stage
@@ -43,7 +38,7 @@ void AED::chargeBattery()
     // Q Timer delay for 11 seconds 
     setState(CHARGING);
     //QTimer for 11s
-    setBatteryLevel(MAX_BATTERY_LEVEL);
+    this -> batteryLevel = MAX_BATTERY_LEVEL;
 }
 
 void AED::shock()
@@ -68,6 +63,7 @@ void AED::moveToCPR()
     // Start q time (10s) Log 2 minutes
     // 
     // 
+
 
 }
 
@@ -128,6 +124,7 @@ void AED::setPatientHeartCondition(HeartState patientHeartCondition)
 void AED::setState(AEDState state)
 {
     this->state = state;
+    emit stateChanged(state);
 }
 
 void AED::setPadsAttached(bool padsAttached)
@@ -135,11 +132,10 @@ void AED::setPadsAttached(bool padsAttached)
     this->padsAttached = padsAttached;
 }
 
-void AED::setBatteryLevel(int batteryLevel)
-{
-    if(batteryLevel > MAX_BATTERY_LEVEL) this->batteryLevel = MAX_BATTERY_LEVEL;
-    if(batteryLevel < 0) this->batteryLevel = 0;
-    this->batteryLevel = batteryLevel;
+void AED::setBatteryLevel(int level){
+    batteryLevel = level;
+    emit batteryChanged(level);
+
 }
 
 void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle)
@@ -147,4 +143,9 @@ void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdl
     batteryLevel = startingLevel;
     batteryUnitsPerShock = unitsPerShock;
     batteryUnitsWhenIdle = unitsWhenIdle;
+    emit batteryChanged(startingLevel);
+}
+
+void AED::setShockUntilHealthy(int shockUntilHealthy){
+    this -> shockUntilHealthy = shockUntilHealthy;
 }
