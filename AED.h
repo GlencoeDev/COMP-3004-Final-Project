@@ -9,13 +9,14 @@
 
 #include "HeartState.h"
 #include "AEDState.h"
+#include "defs.h"
 
 class AED{
     public:
         AED();
         AED(AEDState state, int batteryLevel, bool padsAttached, HeartState patientHeartCondition);
         ~AED();
-        void selfTest();
+        bool selfTest();
         void startProcedure();
         void chargeBattery();
         void moveToCPR();
@@ -42,8 +43,8 @@ class AED{
         AEDState state;
         bool padsAttached;
         int batteryLevel;
-        
-}
+        int shockCount;
+};
 
 #endif
 

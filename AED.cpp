@@ -9,14 +9,7 @@ AED::AED()
     this->batteryLevel = 100;
     this->padsAttached = false;
     this->patientHeartCondition = NORMAL;
-}
-
-AED::AED(AEDState state, int batteryLevel, bool padsAttached, HeartState patientHeartCondition)
-{
-    this->state = state;
-    this->batteryLevel = batteryLevel;
-    this->padsAttached = padsAttached;
-    this->patientHeartCondition = patientHeartCondition;
+    this->shockCount = 0;
 }
 
 AED::~AED()

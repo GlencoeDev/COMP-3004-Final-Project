@@ -5,7 +5,9 @@
 #define CM_PIX_RATIO 15.0
 #define SHALLOW_PUSH 5.0
 #define DEEP_PUSH 7.0
-
+#define MIN_BATTERY_LEVEL 20
+#define MAX_BATTERY_LEVEL 100
+#define SUFFICIENT_BATTERY_LEVEL 20
 // Device state.
 enum AEDState { OFF, ON };
 
