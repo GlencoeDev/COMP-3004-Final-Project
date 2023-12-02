@@ -467,7 +467,7 @@ border: 0;</string>
    <widget class="QFrame" name="patientInfoController">
     <property name="geometry">
      <rect>
-      <x>837</x>
+      <x>830</x>
       <y>0</y>
       <width>271</width>
       <height>915</height>
@@ -489,7 +489,7 @@ border-left: 2px solid black;
       <rect>
        <x>50</x>
        <y>20</y>
-       <width>163</width>
+       <width>192</width>
        <height>55</height>
       </rect>
      </property>
@@ -526,6 +526,7 @@ background: transparent;</string>
          <font>
           <family>Arial</family>
           <pointsize>18</pointsize>
+          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -658,6 +659,32 @@ border: 2px solid #8a8f9e;</string>
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QPushButton" name="shallowPushButton">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>250</y>
+       <width>131</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Shallow Push</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="deepPushButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>290</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deep Push</string>
+     </property>
     </widget>
    </widget>
   </widget>

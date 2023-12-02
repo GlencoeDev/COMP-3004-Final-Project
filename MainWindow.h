@@ -27,11 +27,16 @@ public slots:
 
     // Functions for updating CPR depth compression indicator.
     void setCPRDepth(float depth);
+    void setTextMsg(const QString& msg);
 
 private slots:
     void on_powerBtn_toggled(bool checked);
 
     void on_conditionSelector_currentIndexChanged(int index);
+
+    void on_shallowPushButton_clicked();
+
+    void on_deepPushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -50,6 +55,6 @@ private:
     // Saves elapsed time.
     int elapsedTimeSec;
 
-    DeviceState state;
+    AEDState state;
 };
 #endif
