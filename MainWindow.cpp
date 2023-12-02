@@ -35,6 +35,10 @@ MainWindow::MainWindow(QWidget *parent)
     elapsedTimeSec = 0;
     timeUpdateCounter = new QTimer(this);
 
+    // Set default value for patient condition.
+    ui->conditionSelector->setCurrentIndex(0);
+    // Disable by default since patient is healthy by default.
+    ui->numOfRunsSelector->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -200,3 +204,19 @@ void MainWindow::resetElapsedTime()
 
     QApplication::processEvents();
 }
+
+void MainWindow::on_conditionSelector_currentIndexChanged(int index)
+{
+    // Disable selector for the number of runs since
+    // we can only run it once if the patient is healthy.
+    if (index == 0)
+    {
+        ui->numOfRunsSelector->setValue(1);
+        ui->numOfRunsSelector->setEnabled(false);
+    }
+    else
+    {
+        ui->numOfRunsSelector->setEnabled(true);
+    }
+}
+

@@ -31,6 +31,8 @@ public slots:
 private slots:
     void on_powerBtn_toggled(bool checked);
 
+    void on_conditionSelector_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
