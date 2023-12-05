@@ -117,9 +117,6 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     }
     else
     {
-        // Emit a signal to the AED to start operation.
-        device->powerOff();
-
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
         ui->numOfRunsSelector->setEnabled(true);
@@ -209,6 +206,7 @@ void MainWindow::resetElapsedTime()
 {
     elapsedTimeSec = 0;
     ui->elapsedTime->setText("00:00");
+    ui->shockCount->setText("00");
 
     QApplication::processEvents();
 }
@@ -346,6 +344,8 @@ void MainWindow::updateState(AEDState state){
             setTextMsg(QString("Shocking the patient"));
         break;
     }
+
+    QApplication::processEvents();
 }
 
 void MainWindow::updatePatientCondition(HeartState condition)
@@ -357,3 +357,9 @@ void MainWindow::updateNumberOfShocks(int shocks)
 {
     ui->shockCount->setText(QString("%1").arg(shocks, 2, 10, QChar('0')));
 }
+
+void MainWindow::on_cprPadsAction_toggled(bool checked)
+{
+    emit setPadsAttached(checked);
+}
+

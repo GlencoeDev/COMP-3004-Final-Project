@@ -37,7 +37,6 @@ public slots:
 
     // Make UI changes depending on the current state of AED.
     void updateState(AEDState state);
-
     void updatePatientCondition(HeartState condition);
     void updateNumberOfShocks(int shocks);
 
@@ -51,13 +50,14 @@ private slots:
     void on_conditionSelector_currentIndexChanged(int index);
     void on_shallowPushButton_clicked();
     void on_deepPushButton_clicked();
-
+    void on_cprPadsAction_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
 
     void updateElapsedTime();
     void resetElapsedTime();
+    void resetStats();
 
     void toggleBatteryUnitControls(bool enable);
 

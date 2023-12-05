@@ -7,14 +7,16 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setStyle(QStyleFactory::create("Fusion"));
+
     MainWindow w;
 
     // Create AED device.
     AED* device = new AED();
+
     w.addAED(device);
 
-
-    a.setStyle(QStyleFactory::create("Fusion"));
+    // TODO: Put AED class into a separate thread.
 
     w.show();
 

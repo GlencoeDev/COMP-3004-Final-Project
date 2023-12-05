@@ -17,11 +17,6 @@ class AED : public QObject{
     Q_OBJECT
 public:
     explicit AED();
-    void run();
-    void chargeBattery();
-    void moveToCPR();
-
-    void powerOff();
 
     // Getters
     HeartState getPatientHeartCondition() const;
@@ -50,6 +45,7 @@ signals:
     void updatePatientCondition(HeartState condition);
 
 private:
+    void run();
     void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
 
