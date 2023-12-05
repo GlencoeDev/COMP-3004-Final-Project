@@ -12,13 +12,23 @@
 // Device state.
 enum AEDState
 {
-    OFF, // Off state
-    SELF_TEST, // Self test state
-    STANDBY, // Standby state
-    ANALYZING, // Analyzing state
-    CHARGING, // Charging state
-    CPR, // CPR state
-    SHOCKING, // Shocking state
+    SELF_TEST_SUCCESS,
+    SELF_TEST_FAIL,
+    CHANGE_BATTERIES,
+    STAY_CALM,
+    CHECK_RESPONSE,
+    CALL_HELP,
+    ATTACH_PADS,
+    ANALYZING,          // Don't touch patient. Analyzing.
+    SHOCK_ADVISED,
+    NO_SHOCK_ADVISED,
+    STAND_CLEAR,        // Don't touch the patient.
+    SHOCKING,           // Shock will be delivered in three, two, one...
+    SHOCK_DELIVERED,
+    CHARGING,
+    CPR,
+    STOP_CPR,
+    ABORT               // Turn off if the patient was determined to be healthy.
 };
 
 // Specifies heart condition of the patient.
@@ -27,6 +37,7 @@ enum HeartState
     NORMAL, // Normal sinus rhythm
     VENTRICULAR_FIBRILLATION, // Ventricular fibrillation
     VENTRICULAR_TACHYCARDIA // Ventricular tachycardia
+    ASYSTOLE
 };
 
 #endif
