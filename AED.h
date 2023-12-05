@@ -9,16 +9,16 @@
 #define AED_H
 
 #include "defs.h"
-
+#include <QThread>
 class AED : public QObject{
     Q_OBJECT
     public:
         explicit AED();
-        bool selfTest();
+        //bool selfTest();
         void startProcedure();
         void chargeBattery();
         void moveToCPR();
-        void analyzeHeartRhythm();
+        bool shockable();
         void powerOn();
         void powerOff();
         void shock();
@@ -50,9 +50,13 @@ class AED : public QObject{
         // Indicate battery discharge for each operation.
         int batteryUnitsPerShock = 5;
         int batteryUnitsWhenIdle = 1;
+        void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     signals:
         void stateChanged(AEDState state);
         void batteryChanged(int level);
+        void turnOnIndicator(int indicator);
+        void turnOffIndicator(int indicator);
+        void sendTextMsg(const QString& msg);
 };
 
 #endif
