@@ -9,6 +9,11 @@
 #define MAX_BATTERY_LEVEL 100
 #define SUFFICIENT_BATTERY_LEVEL 20
 
+#define SLEEP 500
+#define SHOCK_TIME 3000
+#define CPR_TIME 5000
+#define ATTACH_PADS_TIME 100
+#define ANALYZING_TIME 2000
 // Device state.
 enum AEDState
 {
@@ -36,7 +41,7 @@ enum HeartState
 {
     NORMAL, // Normal sinus rhythm
     VENTRICULAR_FIBRILLATION, // Ventricular fibrillation
-    VENTRICULAR_TACHYCARDIA // Ventricular tachycardia
+    VENTRICULAR_TACHYCARDIA, // Ventricular tachycardia
     ASYSTOLE
 };
 
