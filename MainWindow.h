@@ -22,9 +22,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    /// Implements Power On Self-Test.
-    void selfTest();
-
     void addAED(AED* device);
 
 public slots:
@@ -37,14 +34,22 @@ public slots:
 
     // Updating battery indicator.
     void updateBatteryLevel(int currentLevel);
-    void setCurrentState(AEDState state);
+
+    // Make UI changes depending on the current state of AED.
+    void updateState(AEDState state);
+
+    void updatePatientCondition(HeartState condition);
+    void updateNumberOfShocks(int shocks);
+
+signals:
+    void setPatientHeartCondition(HeartState patientHeartCondition);
+    void setShockUntilHealthy(int numberOfShocks);
+    void setPadsAttached(bool attached);
+
 private slots:
     void on_powerBtn_toggled(bool checked);
-
     void on_conditionSelector_currentIndexChanged(int index);
-
     void on_shallowPushButton_clicked();
-
     void on_deepPushButton_clicked();
 
 
@@ -53,6 +58,8 @@ private:
 
     void updateElapsedTime();
     void resetElapsedTime();
+
+    void toggleBatteryUnitControls(bool enable);
 
     // Set battery specs on the AED device.
     void setDeviceBatterySpecs();

@@ -626,12 +626,20 @@ background: transparent;
           <property name="styleSheet">
            <string notr="true">color: black;</string>
           </property>
+          <property name="currentText">
+           <string>Sinus Rhythm</string>
+          </property>
           <property name="placeholderText">
            <string/>
           </property>
           <item>
            <property name="text">
-            <string>Healthy</string>
+            <string>Sinus Rhythm</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Asystole</string>
            </property>
           </item>
           <item>
@@ -712,7 +720,7 @@ background: transparent;
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>150</height>
+         <height>200</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -937,6 +945,22 @@ color: black;</string>
           </item>
          </layout>
         </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QPushButton" name="changeBatteries">
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
+          <property name="text">
+           <string>Change Batteries</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -1078,6 +1102,9 @@ border: 2px solid #8a8f9e;</string>
             <height>16777215</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
           <property name="text">
            <string>Shallow Stroke</string>
           </property>
@@ -1090,6 +1117,9 @@ border: 2px solid #8a8f9e;</string>
             <width>120</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
           </property>
           <property name="text">
            <string>Deep Stroke</string>

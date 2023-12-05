@@ -1,139 +1,133 @@
 #include "AED.h"
+#include "MainWindow.h"
+#include <QRandomGenerator>
 
 
 AED::AED()
-    :
-      QObject(nullptr)
-    , patientHeartCondition(NORMAL)
+    : QObject(nullptr)
+    , patientHeartCondition(SINUS_RHYTHM)
     , padsAttached(false)
     , batteryLevel(100)
     , shockCount(0)
 { }
 
-// bool AED::selfTest();
-void AED::startProcedure()
+void AED::powerOn()
 {
-    //Start self test procedure, only checking for battery in this case
-    if(this -> batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+    // Abort if there is not GUI connected.
+    if (gui == nullptr) return;
+
+    run();
+}
+
+void AED::run()
+{
+    // Abort if the device is already running.
+    if (state != OFF) return;
+
+    // Start self test procedure, only checking for battery in this case
+    QThread::msleep(SLEEP);
+
+    // Randomly determine whether the self-test should fail.
+    int random = QRandomGenerator::global()->bounded(100);
+    if (random >= 90)
     {
-        emit stateChanged(SELF_TEST_FAIL);
-        QThread::msleep(SLEEP);
-        emit stateChanged(CHANGE_BATTERIES);
+        emit updateGUI(SELF_TEST_FAIL);
         return;
     }
-    nextStep(SELF_TEST_SUCCESS, SLEEP, batteryUnitsWhenIdle);
+    else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+    {
+        emit updateGUI(CHANGE_BATTERIES);
+        return;
+    }
+    else
+    {
+         nextStep(SELF_TEST_SUCCESS, SLEEP, batteryUnitsWhenIdle);
+    }
+
     nextStep(STAY_CALM, SLEEP, batteryUnitsWhenIdle);
     nextStep(CHECK_RESPONSE, SLEEP, batteryUnitsWhenIdle);
     nextStep(CALL_HELP, SLEEP, batteryUnitsWhenIdle);
 
-    //Ask the user to attach the pads
-    while(!padsAttached){
-        nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
-    }
+    // Ask the user to attach the pads.
+    nextStep(ATTACH_PADS, ATTACH_PADS_TIME, batteryUnitsWhenIdle);
 
-    for(int i = 0; i < shockUntilHealthy; ++i){
+    // Keep spinning while the pads are not attached.
+    while (!padsAttached) {}
+
+    for (int i = 0; i < shockUntilHealthy; ++i)
+    {
         nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
-        if(!shockable()){
-            nextStep(ABORT, 0, 0);
-        }else{
-    //        emit stateChanged(SHOCK_ADVISED);
-    //        QThread::msleep(SLEEP);
 
-            //Check for battery
+        emit updateGUI(shockable() ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
+        QThread::msleep(SLEEP);
+
+        // Normal rhythm. Turn off the device.
+        if (!shockable() && patientHeartCondition == SINUS_RHYTHM)
+        {
+            nextStep(ABORT, 0, 0);
+            return;
+        }
+            // Check for .
             int shockJoule = shockCount >= 3 ? 3 : shockCount;
             int batteryUnits = shockJoule * batteryUnitsPerShock;
-            if(batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL){
+
+            if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
+            {
                 nextStep(CHANGE_BATTERIES, 0, 0);
                 return;
             }
+
             nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
-
             nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
-
             nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
-
             nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
-
             nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
-        };
     }
-
 }
 
-//Going to the next step,
-void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed){
-    emit stateChanged(state);
-    batteryLevel -= batteryUsed;
-    emit batteryChanged(batteryLevel);
-    if(sleepTime != 0){
+void AED::setGUI(MainWindow* mainWindow)
+{
+    this->gui = mainWindow;
+
+    connect(this, SIGNAL(updateGUI(AEDState)), mainWindow, SLOT(updateState(AEDState)));
+    connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
+    connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
+    connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
+}
+
+// Going to the next step.
+void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
+{
+    emit updateGUI(state);
+
+    if (batteryUsed > 0)
+    {
+        batteryLevel -= batteryUsed;
+        emit batteryChanged(batteryLevel);
+    }
+
+    if (state == SHOCK_DELIVERED)
+    {
+        shockCount++;
+        emit updateShockCount(shockCount);
+    }
+
+    if (sleepTime != 0)
+    {
         QThread::msleep(sleepTime);
     }
 }
 bool AED::shockable()
 {
-    // if patiernt is on shockable rythm
-    if(patientHeartCondition == VENTRICULAR_FIBRILLATION
-    || patientHeartCondition == VENTRICULAR_TACHYCARDIA)
+    // if patiernt is on shockable rhythm
+    if (patientHeartCondition == VENTRICULAR_FIBRILLATION ||
+        patientHeartCondition == VENTRICULAR_TACHYCARDIA)
+    {
         return true;
+    }
+
     return false;
 }
-
-//void AED::chargeBattery()
-//{
-//    // Q Timer delay for 11 seconds
-//    emit sendTextMsg(QString("Charge AED!"));
-//    QThread::msleep(SLEEP);
-//    //QTimer for 11s
-//    this -> batteryLevel = MAX_BATTERY_LEVEL;
-//}
-
-//void AED::shock()
-//{
-//    // 1st shock 1%, 2 shock 2%, subsequent shocks 3%
-//    if (this->batteryLevel < MIN_BATTERY_LEVEL)
-//    {
-//        // Battery level is too low to shock.
-//        emit sendTextMsg(QString("Not enough battery!"));
-
-//    }
-    
-//    else
-//    {
-//        setState(SHOCKING);
-//        // Q Timer delay for 11 seconds
-//    }
-    
-//}
-
-
-//void AED::moveToCPR()
-//{
-//    // Start q time (10s) Log 2 minutes
-//    //
-//    //
-
-
-//}
-
-
-//void AED::powerOn()
-//{
-//    setState(STANDBY);
-//}
-
-//void AED::powerOff()
-//{
-//    setState(OFF);
-//}
-
-//void AED::cancelShock()
-//{
-//    if (this->state == SHOCKING)
-//    {
-//        setState(STANDBY);
-//    }
-//}
-
 
 HeartState AED::getPatientHeartCondition() const
 {
@@ -160,12 +154,6 @@ void AED::setPatientHeartCondition(HeartState patientHeartCondition)
     this->patientHeartCondition = patientHeartCondition;
 }
 
-void AED::setState(AEDState state)
-{
-    this->state = state;
-    emit stateChanged(state);
-}
-
 void AED::setPadsAttached(bool padsAttached)
 {
     this->padsAttached = padsAttached;
@@ -174,7 +162,6 @@ void AED::setPadsAttached(bool padsAttached)
 void AED::setBatteryLevel(int level){
     batteryLevel = level;
     emit batteryChanged(level);
-
 }
 
 void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle)
@@ -182,9 +169,8 @@ void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdl
     batteryLevel = startingLevel;
     batteryUnitsPerShock = unitsPerShock;
     batteryUnitsWhenIdle = unitsWhenIdle;
-    emit batteryChanged(startingLevel);
 }
 
 void AED::setShockUntilHealthy(int shockUntilHealthy){
-    this -> shockUntilHealthy = shockUntilHealthy;
+    this->shockUntilHealthy = shockUntilHealthy;
 }

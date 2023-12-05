@@ -14,9 +14,11 @@
 #define CPR_TIME 5000
 #define ATTACH_PADS_TIME 100
 #define ANALYZING_TIME 2000
+
 // Device state.
 enum AEDState
 {
+    OFF,
     SELF_TEST_SUCCESS,
     SELF_TEST_FAIL,
     CHANGE_BATTERIES,
@@ -39,7 +41,7 @@ enum AEDState
 // Specifies heart condition of the patient.
 enum HeartState
 {
-    NORMAL, // Normal sinus rhythm
+    SINUS_RHYTHM, // Normal sinus rhythm
     VENTRICULAR_FIBRILLATION, // Ventricular fibrillation
     VENTRICULAR_TACHYCARDIA, // Ventricular tachycardia
     ASYSTOLE
