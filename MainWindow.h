@@ -36,16 +36,17 @@ public slots:
     void updateBatteryLevel(int currentLevel);
 
     // Make UI changes depending on the current state of AED.
-    void updateGUI(AEDState state);
-    void updatePatientCondition(HeartState condition);
+    void updateGUI(int state);
+    void updatePatientCondition(int condition);
     void updateNumberOfShocks(int shocks);
 
 signals:
-    void setPatientHeartCondition(HeartState patientHeartCondition);
+    void setPatientHeartCondition(int patientHeartCondition);
     void setShockUntilHealthy(int numberOfShocks);
     void setPadsAttached(bool attached);
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void terminate();
+    void powerOn();
 
 private slots:
     void on_powerBtn_toggled(bool checked);

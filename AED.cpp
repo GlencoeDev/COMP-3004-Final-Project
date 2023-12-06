@@ -9,8 +9,21 @@ AED::AED()
     , padsAttached(false)
     , batteryLevel(100)
     , shockCount(0)
-{ }
+{
+    m_thread.reset(new QThread);
+    moveToThread(m_thread.get());
+    m_thread->start();
+}
 
+AED::~AED()
+{
+    QMetaObject::invokeMethod(this, "cleanup");
+    m_thread -> wait();
+}
+void AED::cleanUp(){
+
+    m_thread -> quit();
+}
 void AED::powerOn()
 {
     // Abort if there is not GUI connected.
@@ -89,7 +102,7 @@ void AED::setGUI(MainWindow* mainWindow)
 {
     this->gui = mainWindow;
 
-    connect(this, SIGNAL(updateGUI(AEDState)), mainWindow, SLOT(updateState(AEDState)));
+    connect(this, SIGNAL(updateGUI(int)), mainWindow, SLOT(updateGUI(int)));
     connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
     connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
@@ -149,9 +162,9 @@ int AED::getBatteryLevel() const
     return this->batteryLevel;
 }
 
-void AED::setPatientHeartCondition(HeartState patientHeartCondition)
+void AED::setPatientHeartCondition(int patientHeartCondition)
 {
-    this->patientHeartCondition = patientHeartCondition;
+    this->patientHeartCondition = (HeartState) patientHeartCondition;
 }
 
 void AED::setPadsAttached(bool padsAttached)

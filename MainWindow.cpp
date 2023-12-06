@@ -64,32 +64,33 @@ void MainWindow::addAED(AED* device)
     this->device = device;
 
     // Conect signals and slots.
-    connect(this, SIGNAL(setPatientHeartCondition(HeartState)), device, SLOT(setPatientHeartCondition(HeartState)));
+    connect(this, SIGNAL(setPatientHeartCondition(int)), device, SLOT(setPatientHeartCondition(int)));
     connect(this, SIGNAL(setShockUntilHealthy(int)), device, SLOT(setShockUntilHealthy(int)));
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
+    connect(this, &MainWindow::powerOn, device, &AED::powerOn);
 }
 
-void MainWindow::createAED()
-{
-    if(deviceThread != nullptr)
-    {
-        deviceThread -> wait();
-        delete deviceThread;
-    }
-    if(device != nullptr)
-        delete device;
-    deviceThread = new QThread();
-    device = new AED();
-    device -> moveToThread(deviceThread);
+//void MainWindow::createAED()
+//{
+//    if(deviceThread != nullptr)
+//    {
+//        deviceThread -> wait();
+//        delete deviceThread;
+//    }
+//    if(device != nullptr)
+//        delete device;
+//    deviceThread = new QThread();
+//    device = new AED();
+//    device -> moveToThread(deviceThread);
 
-    connect(deviceThread, &QThread::started, device, &AED::run);
-    connect(this, &MainWindow::setPatientHeartCondition, device, &AED::setPatientHeartCondition);
-    connect(this, &MainWindow::terminate, deviceThread, &QThread::quit);
-    connect(this, &MainWindow::setShockUntilHealthy, device, &AED::setShockUntilHealthy);
-    connect(this, &MainWindow::setPadsAttached, device, &AED::setPadsAttached);
-    connect(this, &MainWindow::setBatterySpecs, device, &AED::setBatterySpecs);
-}
+//    connect(deviceThread, &QThread::started, device, &AED::run);
+//    connect(this, &MainWindow::setPatientHeartCondition, device, &AED::setPatientHeartCondition);
+//    connect(this, &MainWindow::terminate, deviceThread, &QThread::quit);
+//    connect(this, &MainWindow::setShockUntilHealthy, device, &AED::setShockUntilHealthy);
+//    connect(this, &MainWindow::setPadsAttached, device, &AED::setPadsAttached);
+//    connect(this, &MainWindow::setBatterySpecs, device, &AED::setBatterySpecs);
+//}
 
 void MainWindow::turnOnIndicator(int index)
 {
@@ -123,7 +124,7 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     // Initiate self-test after the start.
     if (checked)
     {
-        createAED();
+//        createAED();
         // Disable the patient condition selectors.
         ui->conditionSelector->setEnabled(false);
         ui->numOfRunsSelector->setEnabled(false);
@@ -136,7 +137,7 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         setPatientCondition();
 
         // Start the thread
-        deviceThread -> start();
+        emit powerOn();
     }
     else
     {
@@ -296,14 +297,14 @@ void MainWindow::setPatientCondition()
     int numberOfShock = ui->numOfRunsSelector->value();
 
     // Emit signals to the AED device to set patient condtions.
-    emit setPatientHeartCondition((HeartState)patientHeartCondition);
+    emit setPatientHeartCondition(patientHeartCondition);
     emit setShockUntilHealthy(numberOfShock);
 }
 
-void MainWindow::updateGUI(AEDState state)
+void MainWindow::updateGUI(int state)
 {
-
-    switch (state)
+    AEDState theState = (AEDState) state;
+    switch (theState)
     {
         case SELF_TEST_FAIL:
             setTextMsg("UNIT FAILED.");
@@ -313,7 +314,7 @@ void MainWindow::updateGUI(AEDState state)
         case SELF_TEST_SUCCESS:
             setTextMsg("UNIT OK.");
             ui->selftCheckIndicator->setChecked(true);
-            ui->powerBtn->setChecked(false);
+            ui->powerBtn->setChecked(true);
 
             // Set up the time counter.
             connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
@@ -332,11 +333,16 @@ void MainWindow::updateGUI(AEDState state)
             break;
         case STAY_CALM:
             setTextMsg("STAY CALM.");
+
             break;
         case CHECK_RESPONSE:
             setTextMsg("CHECK RESPONSIVENESS.");
-            // ui->responseIndicator->
+            turnOnIndicator(RESPONSE_INDICATOR);
             break;
+        case CALL_HELP:
+            setTextMsg("CALL HELP.");
+            turnOnIndicator(HELP_INDICATOR);
+
         case ATTACH_PADS:
             // Check the UI whether the pads button is checked.
 
@@ -371,9 +377,9 @@ void MainWindow::updateGUI(AEDState state)
     QApplication::processEvents();
 }
 
-void MainWindow::updatePatientCondition(HeartState condition)
+void MainWindow::updatePatientCondition(int condition)
 {
-    ui->conditionSelector->setCurrentIndex((int)condition);
+    ui->conditionSelector->setCurrentIndex(condition);
 }
 
 void MainWindow::updateNumberOfShocks(int shocks)
