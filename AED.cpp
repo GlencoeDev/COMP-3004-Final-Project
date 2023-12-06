@@ -22,7 +22,7 @@ void AED::powerOn()
 void AED::run()
 {
     // Abort if the device is already running.
-    if (state != OFF) return;
+    //if (state != OFF) return;
 
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
@@ -67,21 +67,21 @@ void AED::run()
             nextStep(ABORT, 0, 0);
             return;
         }
-            // Check for .
-            int shockJoule = shockCount >= 3 ? 3 : shockCount;
-            int batteryUnits = shockJoule * batteryUnitsPerShock;
+        // Check if we have enough battery.
+        int shockJoule = shockCount >= 3 ? 3 : shockCount;
+        int batteryUnits = shockJoule * batteryUnitsPerShock;
 
-            if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
-            {
-                nextStep(CHANGE_BATTERIES, 0, 0);
-                return;
-            }
+        if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
+        {
+            nextStep(CHANGE_BATTERIES, 0, 0);
+            return;
+        }
 
-            nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
-            nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
-            nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
-            nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
-            nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
+        nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
+        nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
+        nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
+        nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
+        nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
     }
 }
 
@@ -117,7 +117,7 @@ void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
         QThread::msleep(sleepTime);
     }
 }
-bool AED::shockable()
+bool AED::shockable() const
 {
     // if patiernt is on shockable rhythm
     if (patientHeartCondition == VENTRICULAR_FIBRILLATION ||

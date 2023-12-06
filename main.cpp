@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     // Create AED device.
-    AED* device = new AED();
+//    AED* device = new AED();
 
-    w.addAED(device);
+//    w.addAED(device);
 
     // TODO: Put AED class into a separate thread.
 

@@ -244,11 +244,17 @@ border: 0;</string>
       <widget class="QLabel" name="elapsedTime">
        <property name="geometry">
         <rect>
-         <x>225</x>
+         <x>220</x>
          <y>10</y>
-         <width>41</width>
+         <width>55</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>30</height>
+        </size>
        </property>
        <property name="font">
         <font>
@@ -379,7 +385,7 @@ border-radius: 0;</string>
         <x>740</x>
         <y>10</y>
         <width>82</width>
-        <height>32</height>
+        <height>35</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -554,7 +560,7 @@ border-bottom-right-radius: 5px;</string>
       <number>0</number>
      </property>
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="patientInfoBox">
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -605,6 +611,7 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -736,6 +743,7 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1037,6 +1045,7 @@ background: transparent;</string>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>

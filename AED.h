@@ -17,7 +17,7 @@ class AED : public QObject{
     Q_OBJECT
 public:
     explicit AED();
-
+    AED* getInstance();
     // Getters
     HeartState getPatientHeartCondition() const;
     AEDState getState() const;
@@ -28,9 +28,10 @@ public:
     void setBatteryLevel(int level);
     void setGUI(MainWindow* mainWindow);
 
+
 public slots:
     void powerOn();
-
+    void run();
     // Set configs prior to simulation.
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void setPatientHeartCondition(HeartState patientHeartCondition);
@@ -45,7 +46,6 @@ signals:
     void updatePatientCondition(HeartState condition);
 
 private:
-    void run();
     void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
 

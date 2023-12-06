@@ -67,6 +67,28 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setPatientHeartCondition(HeartState)), device, SLOT(setPatientHeartCondition(HeartState)));
     connect(this, SIGNAL(setShockUntilHealthy(int)), device, SLOT(setShockUntilHealthy(int)));
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
+    connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
+}
+
+void MainWindow::createAED()
+{
+    if(deviceThread != nullptr)
+    {
+        deviceThread -> wait();
+        delete deviceThread;
+    }
+    if(device != nullptr)
+        delete device;
+    deviceThread = new QThread();
+    device = new AED();
+    device -> moveToThread(deviceThread);
+
+    connect(deviceThread, &QThread::started, device, &AED::run);
+    connect(this, &MainWindow::setPatientHeartCondition, device, &AED::setPatientHeartCondition);
+    connect(this, &MainWindow::terminate, deviceThread, &QThread::quit);
+    connect(this, &MainWindow::setShockUntilHealthy, device, &AED::setShockUntilHealthy);
+    connect(this, &MainWindow::setPadsAttached, device, &AED::setPadsAttached);
+    connect(this, &MainWindow::setBatterySpecs, device, &AED::setBatterySpecs);
 }
 
 void MainWindow::turnOnIndicator(int index)
@@ -91,7 +113,7 @@ void MainWindow::turnOffIndicator(int index)
 
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
-    if (device == nullptr) return;
+//    if (device == nullptr) return;
 
     // Reset timer and remove event listeners.
     timeUpdateCounter->stop();
@@ -101,6 +123,7 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     // Initiate self-test after the start.
     if (checked)
     {
+        createAED();
         // Disable the patient condition selectors.
         ui->conditionSelector->setEnabled(false);
         ui->numOfRunsSelector->setEnabled(false);
@@ -112,8 +135,8 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Set patient heart condition
         setPatientCondition();
 
-        // Emit a signal to the AED to start operation.
-        device->powerOn();
+        // Start the thread
+        deviceThread -> start();
     }
     else
     {
@@ -124,10 +147,12 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         ui->selftCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
-
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
         timeUpdateCounter->start(5000);
+
+        //Terminate the running thread
+        emit terminate();
     }
 }
 
@@ -262,10 +287,11 @@ void MainWindow::setDeviceBatterySpecs()
     ui->batteryIndicator->setValue(startingValue);
 
     // Emit a singal to the AED to set battery specs.
-    device->setBatterySpecs(startingValue, batteryPerShock, batteryWhenIdle);
+    emit setBatterySpecs(startingValue, batteryPerShock, batteryWhenIdle);
 }
 
-void MainWindow::setPatientCondition(){
+void MainWindow::setPatientCondition()
+{
     int patientHeartCondition = ui->conditionSelector->currentIndex();
     int numberOfShock = ui->numOfRunsSelector->value();
 
@@ -274,7 +300,8 @@ void MainWindow::setPatientCondition(){
     emit setShockUntilHealthy(numberOfShock);
 }
 
-void MainWindow::updateState(AEDState state){
+void MainWindow::updateGUI(AEDState state)
+{
 
     switch (state)
     {
@@ -284,7 +311,7 @@ void MainWindow::updateState(AEDState state){
             ui->powerBtn->setChecked(false);
             break;
         case SELF_TEST_SUCCESS:
-        setTextMsg("UNIT OK.");
+            setTextMsg("UNIT OK.");
             ui->selftCheckIndicator->setChecked(true);
             ui->powerBtn->setChecked(false);
 
@@ -300,12 +327,8 @@ void MainWindow::updateState(AEDState state){
             // Block all UI elements until the change batteries.
             toggleBatteryUnitControls(false);
             ui->patientInfoBox->setEnabled(false);
-
             // Enable the button for switching batteries;
             ui->changeBatteries->setEnabled(true);
-
-
-
             break;
         case STAY_CALM:
             setTextMsg("STAY CALM.");
@@ -328,7 +351,7 @@ void MainWindow::updateState(AEDState state){
 
 
         case ANALYZING:
-            setTextMsg(QString("Analyzing the patient heart conditioni"));
+            setTextMsg(QString("ANALYZING PATIENT."));
         break;
 
         case CHARGING:
@@ -341,7 +364,7 @@ void MainWindow::updateState(AEDState state){
         break;
 
         case SHOCKING:
-            setTextMsg(QString("Shocking the patient"));
+            setTextMsg(QString(""));
         break;
     }
 

@@ -36,7 +36,7 @@ public slots:
     void updateBatteryLevel(int currentLevel);
 
     // Make UI changes depending on the current state of AED.
-    void updateState(AEDState state);
+    void updateGUI(AEDState state);
     void updatePatientCondition(HeartState condition);
     void updateNumberOfShocks(int shocks);
 
@@ -44,6 +44,8 @@ signals:
     void setPatientHeartCondition(HeartState patientHeartCondition);
     void setShockUntilHealthy(int numberOfShocks);
     void setPadsAttached(bool attached);
+    void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
+    void terminate();
 
 private slots:
     void on_powerBtn_toggled(bool checked);
@@ -64,6 +66,8 @@ private:
     // Set battery specs on the AED device.
     void setDeviceBatterySpecs();
     void setPatientCondition();
+    void createAED();
+    void deleteAED();
     // Keep a list of the indicators shoing current AED operation step.
     QList<QLabel*> stepIndicators;
 
@@ -74,5 +78,6 @@ private:
     int elapsedTimeSec;
 
     AED* device;
+    QThread* deviceThread;
 };
 #endif
