@@ -9,12 +9,13 @@
 #define MAX_BATTERY_LEVEL 100
 #define SUFFICIENT_BATTERY_LEVEL 20
 
-#define SLEEP 1000
+#define SLEEP 3000
 #define SHOCKING_TIME 3000
-#define CPR_TIME 5000
+#define CPR_TIME 10000
 #define ATTACH_PADS_TIME 100
 #define ANALYZING_TIME 2000
 #define CHANGE_BATTERIES_TIME 5000
+#define CHECK_PADS_TIME 1000
 #define RESPONSE_INDICATOR 0
 #define HELP_INDICATOR 1
 #define PADS_INDICATOR 2
@@ -41,7 +42,8 @@ enum AEDState
     SHOCK_DELIVERED,
     CPR,
     STOP_CPR,
-    ABORT               // Turn off if the patient was determined to be healthy.
+    ABORT,               // Turn off if the patient was determined to be healthy.
+    LOST_CONNECTION      // Simulate losing connection.
 };
 
 // Specifies heart condition of the patient.

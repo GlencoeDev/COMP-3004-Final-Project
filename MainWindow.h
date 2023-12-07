@@ -50,6 +50,8 @@ signals:
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void terminate();
     void powerOn();
+    void setLostConnection(bool simulateConnectionLoss);
+    void setBatteryLevel(int level);
 
 private slots:
     void on_powerBtn_toggled(bool checked);
@@ -57,8 +59,8 @@ private slots:
     void on_shallowPushButton_clicked();
     void on_deepPushButton_clicked();
     void on_cprPadsAttached_clicked(bool checked);
-
     void on_changeBatteries_clicked();
+    void on_reconnectBtn_clicked();
 
 private:
     Ui::MainWindow *ui;

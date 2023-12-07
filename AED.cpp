@@ -9,6 +9,7 @@ AED::AED()
     , padsAttached(false)
     , batteryLevel(100)
     , shockCount(0)
+    , loseConnection(false)
 {
     m_thread.reset(new QThread);
     moveToThread(m_thread.get());
@@ -32,11 +33,38 @@ void AED::powerOn()
     run();
 }
 
+void AED::checkPadsAttached()
+{
+    if (!padsAttached)
+    {
+        QMutexLocker locker(&padsAttachedMutex);
+        waitForPadsAttachement.wait(&padsAttachedMutex);
+    }
+    else
+    {
+        QThread::msleep(CHECK_PADS_TIME);
+    }
+}
+
+void AED::setLostConnection(bool simulateConnectionLoss)
+{
+    this->loseConnection = simulateConnectionLoss;
+}
+
+
+void AED::checkConnection()
+{
+    // Simulate connection loss if such testing requirement was selected with ~33% probability.
+    int random = QRandomGenerator::global()->bounded(2);
+    if (loseConnection && random == 2)
+    {
+        QMutexLocker locker(&restoreConnectionMutex);
+        waitForConnection.wait(&restoreConnectionMutex);
+    }
+}
+
 void AED::run()
 {
-    // Abort if the device is already running.
-    //if (state != OFF) return;
-
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
 
@@ -66,16 +94,7 @@ void AED::run()
     // Ask the user to attach the pads.
     nextStep(ATTACH_PADS, ATTACH_PADS_TIME, batteryUnitsWhenIdle);
 
-    // Keep spinning while the pads are not attached.
-    if (!padsAttached)
-    {
-        QMutexLocker locker(&padsAttachedMutex);
-        waitForPadsAttachement.wait(&padsAttachedMutex);
-    }
-    else
-    {
-        QThread::msleep(200);
-    }
+    checkPadsAttached();
 
     // One extra round of CPR before delivering all shocks.
     if (startWithAsystole)
@@ -106,6 +125,10 @@ void AED::run()
             nextStep(ABORT, 0, 0);
             return;
         }
+
+        // Simulate connection loss.
+
+
 
         if (shockNeeded)
         {

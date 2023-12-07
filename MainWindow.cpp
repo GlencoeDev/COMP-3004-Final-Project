@@ -77,6 +77,7 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
     connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
+    connect(this, SIGNAL(setBatteryLevel(int)), device, SIGNAL(setBatteryLevel(int)));
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
 }
 
@@ -153,7 +154,9 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Set patient heart condition.
         setPatientCondition();
 
+        // Set other conditions prior to running the device.
         emit setPadsAttached(ui->cprPadsAttached->isChecked());
+        emit setLostConnection(ui->connectionLoss->isChecked());
 
         // Start the AED thread.
         emit powerOn();
@@ -252,7 +255,7 @@ void MainWindow::resetElapsedTime()
 {
     elapsedTimeSec = 0;
     ui->elapsedTime->setText("00:00");
-    ui->shockCount->setText("SHOCKS: 0");
+    ui->shockCount->setText("SHOCKS: 00");
 
     QApplication::processEvents();
 }
@@ -436,6 +439,10 @@ void MainWindow::updateGUI(int state)
         // TODO: Update ECG waveform.
     break;
 
+//    case LOST_CONNECTION:
+//        turnOnIndicator("CONNECTION LOST");
+//    break;
+
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("NO SHOCK ADVISED");
@@ -453,7 +460,7 @@ void MainWindow::updateGUI(int state)
 
     case SHOCKING:
         turnOnIndicator(SHOCK_INDICATOR);
-        setTextMsg("SHOCK WILL BE DELIVERED IN 1, 2, 3");
+        setTextMsg("SHOCK WILL BE DELIVERED IN ONE, TWO, THREE...");
     break;
 
     case SHOCK_DELIVERED:
@@ -471,8 +478,8 @@ void MainWindow::updateGUI(int state)
     case STOP_CPR:
         setTextMsg("STOP CPR");
         //Disable CPR button
-        ui -> shallowPushButton -> setEnabled(false);
-        ui -> deepPushButton -> setEnabled(false);
+        ui->shallowPushButton->setEnabled(false);
+        ui->deepPushButton->setEnabled(false);
         setCPRDepth(0.0);
     break;
 
@@ -522,7 +529,16 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
 
 void MainWindow::on_changeBatteries_clicked()
 {
-    //Reset the battery to max battery level
-    ui -> startingBatteryLevel -> setValue(MAX_BATTERY_LEVEL);
+    // Reset the battery to max battery level.
+    ui->startingBatteryLevel->setValue(MAX_BATTERY_LEVEL);
+    emit setBatteryLevel(MAX_BATTERY_LEVEL);
+}
+
+
+void MainWindow::on_reconnectBtn_clicked()
+{
+    // Reset connection setting.
+    ui->connectionLoss->setChecked(false);
+    emit setLostConnection(false);
 }
 

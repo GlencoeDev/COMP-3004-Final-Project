@@ -689,8 +689,8 @@ border-bottom-right-radius: 5px;</string>
      <rect>
       <x>880</x>
       <y>20</y>
-      <width>218</width>
-      <height>895</height>
+      <width>240</width>
+      <height>858</height>
      </rect>
     </property>
     <property name="lineWidth">
@@ -875,6 +875,9 @@ background: transparent;
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox_2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -1123,6 +1126,147 @@ color: black;</string>
       </widget>
      </item>
      <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>16</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border: 0;
+color: black;
+background: transparent;</string>
+          </property>
+          <property name="text">
+           <string>Test Conditions</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="connectionLoss">
+          <property name="text">
+           <string>Connection Loss</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="reconnectBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Reconnect</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="horizontalGroupBox_8">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>250</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QToolButton" name="cprPadsAttached">
+          <property name="toolTip">
+           <string>Attach CPR Pads</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background: white;
+border-radius: 10px;
+border: 2px solid #8a8f9e;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="Resources.qrc">
+            <normaloff>:/Icons/detach_cpr_pads.png</normaloff>
+            <normalon>:/Icons/attach_cpr_pads.png</normalon>
+            <disabledoff>:/Icons/detach_cpr_pads.png</disabledoff>
+            <disabledon>:/Icons/attach_cpr_pads.png</disabledon>:/Icons/detach_cpr_pads.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>125</width>
+            <height>125</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QPushButton" name="shallowPushButton">
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
+          <property name="text">
+           <string>Shallow Stroke</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="QPushButton" name="deepPushButton">
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
+          <property name="text">
+           <string>Deep Stroke</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -1205,84 +1349,6 @@ color: black;</string>
           </property>
           <property name="text">
            <string>Audio Message</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="horizontalGroupBox_8">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>250</height>
-        </size>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QToolButton" name="cprPadsAttached">
-          <property name="toolTip">
-           <string>Attach CPR Pads</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background: white;
-border-radius: 10px;
-border: 2px solid #8a8f9e;</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="Resources.qrc">
-            <normaloff>:/Icons/detach_cpr_pads.png</normaloff>
-            <normalon>:/Icons/attach_cpr_pads.png</normalon>
-            <disabledoff>:/Icons/detach_cpr_pads.png</disabledoff>
-            <disabledon>:/Icons/attach_cpr_pads.png</disabledon>:/Icons/detach_cpr_pads.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>125</width>
-            <height>125</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QPushButton" name="shallowPushButton">
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: black;</string>
-          </property>
-          <property name="text">
-           <string>Shallow Stroke</string>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QPushButton" name="deepPushButton">
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: black;</string>
-          </property>
-          <property name="text">
-           <string>Deep Stroke</string>
           </property>
          </widget>
         </item>

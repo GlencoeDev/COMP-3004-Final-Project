@@ -30,7 +30,6 @@ public:
     int getBatteryLevel() const;
 
     // Setters
-    void setBatteryLevel(int level);
     void setGUI(MainWindow* mainWindow);
 
 public slots:
@@ -43,6 +42,8 @@ public slots:
     void setPadsAttached(bool padsAttached);
     void notifyPadsAttached();
     void setStartWithAsystole(bool checked);
+    void setLostConnection(bool simulateConnectionLoss);
+    void setBatteryLevel(int level);
 
 private slots:
     void cleanUp();
@@ -57,12 +58,16 @@ private:
     void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
     void run();
+    void checkPadsAttached();
+    void checkConnection();
+
     HeartState patientHeartCondition;
     bool startWithAsystole;
     AEDState state;
     bool padsAttached;
     int batteryLevel;
     int shockCount;
+    bool loseConnection;
 
     // For simulation purpose.
     int shockUntilHealthy;
@@ -73,6 +78,9 @@ private:
 
     QMutex padsAttachedMutex;
     QWaitCondition waitForPadsAttachement;
+
+    QMutex restoreConnectionMutex;
+    QWaitCondition waitForConnection;
 
     MainWindow* gui;
     std::unique_ptr<QThread> m_thread;
