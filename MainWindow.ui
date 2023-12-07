@@ -95,105 +95,6 @@ border-top-right-radius: 5px;</string>
      <property name="lineWidth">
       <number>0</number>
      </property>
-     <widget class="QLabel" name="responseIndicator">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>340</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="helpIndicator">
-      <property name="geometry">
-       <rect>
-        <x>340</x>
-        <y>150</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="attachIndicator">
-      <property name="geometry">
-       <rect>
-        <x>625</x>
-        <y>420</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="contactIndicator">
-      <property name="geometry">
-       <rect>
-        <x>635</x>
-        <y>625</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="cprIndicator">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>640</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="shockIndicator">
-      <property name="geometry">
-       <rect>
-        <x>410</x>
-        <y>470</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
@@ -296,8 +197,7 @@ border: 0;</string>
         <number>0</number>
        </property>
        <property name="text">
-        <string>CHECK
-RESPONSIVNESS</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -448,6 +348,233 @@ QProgressBar::chunk {
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="responseIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>340</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="helpIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>150</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="padsIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>625</x>
+        <y>420</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="contactIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>635</x>
+        <y>625</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="cprIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>640</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="shockIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>412</x>
+        <y>470</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/indicator_off.png</normaloff>
+        <normalon>:/Icons/indicator_on.png</normalon>
+        <disabledoff>:/Icons/indicator_off.png</disabledoff>
+        <disabledon>:/Icons/indicator_on.png</disabledon>:/Icons/indicator_off.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="padsAttachedIndicator">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>730</x>
+        <y>50</y>
+        <width>100</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: 0;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="Resources.qrc">
+        <normaloff>:/Icons/pads_indicator_off.png</normaloff>
+        <normalon>:/Icons/pads_indicator_on.png</normalon>
+        <disabledoff>:/Icons/pads_indicator_off.png</disabledoff>
+        <disabledon>:/Icons/pads_indicator_on.png</disabledon>:/Icons/pads_indicator_off.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>50</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QGroupBox" name="controlBtnBox">
@@ -611,7 +738,6 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -743,7 +869,6 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1045,7 +1170,6 @@ background: transparent;</string>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1072,7 +1196,7 @@ color: black;</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item alignment="Qt::AlignHCenter">
-         <widget class="QToolButton" name="cprPadsAction">
+         <widget class="QToolButton" name="cprPadsAttached">
           <property name="toolTip">
            <string>Attach CPR Pads</string>
           </property>
@@ -1082,12 +1206,14 @@ border-radius: 10px;
 border: 2px solid #8a8f9e;</string>
           </property>
           <property name="text">
-           <string>...</string>
+           <string/>
           </property>
           <property name="icon">
            <iconset resource="Resources.qrc">
-            <normaloff>:/Icons/attach_cpr_pads.png</normaloff>
-            <normalon>:/Icons/detach_cpr_pads.png</normalon>:/Icons/attach_cpr_pads.png</iconset>
+            <normaloff>:/Icons/detach_cpr_pads.png</normaloff>
+            <normalon>:/Icons/attach_cpr_pads.png</normalon>
+            <disabledoff>:/Icons/detach_cpr_pads.png</disabledoff>
+            <disabledon>:/Icons/attach_cpr_pads.png</disabledon>:/Icons/detach_cpr_pads.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -1099,7 +1225,7 @@ border: 2px solid #8a8f9e;</string>
            <bool>true</bool>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>

@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QTimer>
 #include <QObject>
+#include <QWaitCondition>
 
 #ifndef AED_H
 #define AED_H
@@ -19,6 +20,7 @@ public:
     explicit AED();
     ~AED();
     AED* getInstance();
+
     // Getters
     HeartState getPatientHeartCondition() const;
     AEDState getState() const;
@@ -38,6 +40,7 @@ public slots:
     void setPatientHeartCondition(int patientHeartCondition);
     void setShockUntilHealthy(int shockUntilHealthy);
     void setPadsAttached(bool padsAttached);
+    void notifyPadsAttached();
 
 private slots:
     void cleanUp();
@@ -64,6 +67,9 @@ private:
     // Indicate battery discharge for each operation.
     int batteryUnitsPerShock = 5;
     int batteryUnitsWhenIdle = 1;
+
+    QMutex padsAttachedMutex;
+    QWaitCondition waitForPadsAttachement;
 
     MainWindow* gui;
     std::unique_ptr<QThread> m_thread;

@@ -11,5 +11,7 @@
         <file>Icons/detach_cpr_pads.png</file>
         <file>Icons/patient.png</file>
         <file>Icons/audioIcon.png</file>
+        <file>Icons/pads_indicator_off.png</file>
+        <file>Icons/pads_indicator_on.png</file>
     </qresource>
 </RCC>

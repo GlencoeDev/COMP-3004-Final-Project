@@ -17,10 +17,11 @@
 
 #define RESPONSE_INDICATOR 0
 #define HELP_INDICATOR 1
-#define ATTACH_INDICATOR 2
+#define PADS_INDICATOR 2
 #define CONTACT_INDICATOR 3
 #define CPR_INDICATOR 4
 #define SHOCK_INDICATOR 5
+
 // Device state.
 enum AEDState
 {
@@ -35,10 +36,9 @@ enum AEDState
     ANALYZING,          // Don't touch patient. Analyzing.
     SHOCK_ADVISED,
     NO_SHOCK_ADVISED,
-    STAND_CLEAR,        // Don't touch the patient.
+    STAND_CLEAR,
     SHOCKING,           // Shock will be delivered in three, two, one...
     SHOCK_DELIVERED,
-    CHARGING,
     CPR,
     STOP_CPR,
     ABORT               // Turn off if the patient was determined to be healthy.

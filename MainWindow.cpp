@@ -7,13 +7,14 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , currentStep(-1)
 {
     ui->setupUi(this);
 
     // Set styling for all indicators.
     stepIndicators << ui->responseIndicator
                    << ui->helpIndicator
-                   << ui->attachIndicator
+                   << ui->padsIndicator
                    << ui->contactIndicator
                    << ui->cprIndicator
                    << ui->shockIndicator;
@@ -21,8 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap pixmap(":/Icons/indicator_off.png");
     foreach(auto indicator, stepIndicators)
     {
-        indicator->setStyleSheet("background: transparent;");
-        indicator->setPixmap(pixmap);
+        indicator->setEnabled(false);
     }
 
     // Disallow clicking on the self-test indicator.
@@ -41,15 +41,21 @@ MainWindow::MainWindow(QWidget *parent)
     // Disable by default since patient is healthy by default.
     ui->numOfRunsSelector->setEnabled(false);
 
-    // Disable attach pads button.
-    ui->cprPadsAction->setEnabled(false);
-
     // Disable the stroke buttons.
     // TODO: Only re-enable stroke buttons.
     ui->shallowPushButton->setEnabled(false);
     ui->deepPushButton->setEnabled(false);
-
     ui->changeBatteries->setEnabled(false);
+
+    // Set up timer for flashing step indicator.
+    indicatorTimer = new QTimer(this);
+    connect(indicatorTimer, &QTimer::timeout, this, [this]() {
+        if (this->currentStep > -1)
+        {
+            stepIndicators[this->currentStep]->toggle();
+        }
+    });
+    indicatorTimer->start(500);
 }
 
 MainWindow::~MainWindow()
@@ -67,38 +73,35 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setPatientHeartCondition(int)), device, SLOT(setPatientHeartCondition(int)));
     connect(this, SIGNAL(setShockUntilHealthy(int)), device, SLOT(setShockUntilHealthy(int)));
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
+    connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
 }
-
-//void MainWindow::createAED()
-//{
-//    if(deviceThread != nullptr)
-//    {
-//        deviceThread -> wait();
-//        delete deviceThread;
-//    }
-//    if(device != nullptr)
-//        delete device;
-//    deviceThread = new QThread();
-//    device = new AED();
-//    device -> moveToThread(deviceThread);
-
-//    connect(deviceThread, &QThread::started, device, &AED::run);
-//    connect(this, &MainWindow::setPatientHeartCondition, device, &AED::setPatientHeartCondition);
-//    connect(this, &MainWindow::terminate, deviceThread, &QThread::quit);
-//    connect(this, &MainWindow::setShockUntilHealthy, device, &AED::setShockUntilHealthy);
-//    connect(this, &MainWindow::setPadsAttached, device, &AED::setPadsAttached);
-//    connect(this, &MainWindow::setBatterySpecs, device, &AED::setBatterySpecs);
-//}
 
 void MainWindow::turnOnIndicator(int index)
 {
     if (index < 0 || index > stepIndicators.length() - 1) return;
 
-    QPixmap pixmap(":/Icons/indicator_on.png");
-    stepIndicators[index]->setPixmap(pixmap);
-    stepIndicators[index]->repaint();
+    currentStep = index;
+
+    for (int i = 0; i < stepIndicators.length(); ++i)
+    {
+        if (index == i)
+        {
+            if (!stepIndicators[i]->isChecked())
+            {
+                stepIndicators[i]->setChecked(true);
+            }
+        }
+        else
+        {
+            if (stepIndicators[i]->isChecked())
+            {
+                stepIndicators[i]->setChecked(false);
+            }
+        }
+    }
+
     QCoreApplication::processEvents();
 }
 
@@ -106,16 +109,27 @@ void MainWindow::turnOffIndicator(int index)
 {
     if (index < 0 || index > stepIndicators.length() - 1) return;
 
-    QPixmap pixmap(":/Icons/indicator_off.png");
-    stepIndicators[index]->setPixmap(pixmap);
-    stepIndicators[index]->repaint();
+    currentStep = -1;
+
+    stepIndicators[index]->setChecked(false);
+
+    QCoreApplication::processEvents();
+}
+
+void MainWindow::turnOffAllIndicators()
+{
+    currentStep = -1;
+
+    foreach(auto indicator, stepIndicators)
+    {
+        indicator->setChecked(false);
+    }
+
     QCoreApplication::processEvents();
 }
 
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
-//    if (device == nullptr) return;
-
     // Reset timer and remove event listeners.
     timeUpdateCounter->stop();
     disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
@@ -124,19 +138,22 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     // Initiate self-test after the start.
     if (checked)
     {
-//        createAED();
-        // Disable the patient condition selectors.
+        // Disable all configuration settings.
         ui->conditionSelector->setEnabled(false);
         ui->numOfRunsSelector->setEnabled(false);
         toggleBatteryUnitControls(false);
 
-        // Set the battery spec for the device
+        ui->padsIndicator->setEnabled(false);
+
+        // Set the battery spec for the device.
         setDeviceBatterySpecs();
 
-        // Set patient heart condition
+        // Set patient heart condition.
         setPatientCondition();
 
-        // Start the thread
+        emit setPadsAttached(ui->cprPadsAttached->isChecked());
+
+        // Start the AED thread.
         emit powerOn();
     }
     else
@@ -144,15 +161,18 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
         ui->numOfRunsSelector->setEnabled(true);
-        ui->batteryUnitLayout->setEnabled(true);
+        toggleBatteryUnitControls(false);
+
+        ui->padsIndicator->setEnabled(true);
 
         ui->selftCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
+
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
         timeUpdateCounter->start(5000);
 
-        //Terminate the running thread
+        // Terminate the running thread
         emit terminate();
     }
 }
@@ -255,14 +275,14 @@ void MainWindow::on_conditionSelector_currentIndexChanged(int index)
 void MainWindow::on_deepPushButton_clicked()
 {
     setCPRDepth(DEEP_PUSH);
-    setTextMsg(QString("GOOD COMPRESSIONS."));
+    setTextMsg(QString("GOOD COMPRESSIONS"));
 }
 
 
 void MainWindow::on_shallowPushButton_clicked()
 {
     setCPRDepth(SHALLOW_PUSH);
-    setTextMsg(QString("PUSH HARDER."));
+    setTextMsg(QString("PUSH HARDER"));
 }
 
 void MainWindow::updateBatteryLevel(int currentLevel)
@@ -274,6 +294,38 @@ void MainWindow::updateBatteryLevel(int currentLevel)
 
 void MainWindow::setTextMsg(const QString& msg)
 {
+    QString displayedMsg = msg;
+    QFont labelFont = QApplication::font();
+
+    // Check the length of the message and decrease the font if necessary.
+    if (msg.length() > 10)
+    {
+        auto strs = displayedMsg.split(" ", Qt::SkipEmptyParts);
+        displayedMsg.clear();
+        for (int i = 0; i < strs.length(); ++i)
+        {
+            if (displayedMsg.length() == 10)
+            {
+                displayedMsg += "/n";
+            }
+            else if (i != strs.length() - 1)
+            {
+                displayedMsg += " ";
+            }
+
+            displayedMsg += strs[i];
+        }
+
+       labelFont.setPointSize(8);
+    }
+    else
+    {
+        labelFont.setPointSize(11);
+    }
+
+    ui->textMsg->setFont(labelFont);
+    ui->audioLabel->setFont(labelFont);
+
     ui->textMsg->setText(msg);
     ui->audioLabel->setText(msg);
 }
@@ -306,72 +358,98 @@ void MainWindow::updateGUI(int state)
     AEDState theState = (AEDState) state;
     switch (theState)
     {
-        case SELF_TEST_FAIL:
-            setTextMsg("UNIT FAILED.");
-            ui->selftCheckIndicator->setChecked(false);
-            ui->powerBtn->setChecked(false);
-            break;
-        case SELF_TEST_SUCCESS:
-            setTextMsg("UNIT OK.");
-            ui->selftCheckIndicator->setChecked(true);
-            ui->powerBtn->setChecked(true);
+    case OFF:
+        setTextMsg("");
+        ui->selftCheckIndicator->setChecked(false);
+        ui->powerBtn->setChecked(false);
+        currentStep = -1;
+        break;
+    case SELF_TEST_FAIL:
+        setTextMsg("UNIT FAILED.");
+        ui->selftCheckIndicator->setChecked(false);
+        ui->powerBtn->setChecked(false);
+        break;
+    case SELF_TEST_SUCCESS:
+        setTextMsg("UNIT OK.");
+        ui->selftCheckIndicator->setChecked(true);
+        ui->powerBtn->setChecked(true);
 
-            // Set up the time counter.
-            connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
-            timeUpdateCounter->start(1000);
+        // Set up the time counter.
+        connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+        timeUpdateCounter->start(1000);
 
-            break;
-        case CHANGE_BATTERIES:
-            setTextMsg("CHANGE BATTERIES");
-            ui->selftCheckIndicator->setEnabled(false);
+        break;
+    case CHANGE_BATTERIES:
+        setTextMsg("CHANGE BATTERIES");
+        ui->selftCheckIndicator->setEnabled(false);
 
-            // Block all UI elements until the change batteries.
-            toggleBatteryUnitControls(false);
-            ui->patientInfoBox->setEnabled(false);
-            // Enable the button for switching batteries;
-            ui->changeBatteries->setEnabled(true);
-            break;
-        case STAY_CALM:
-            setTextMsg("STAY CALM.");
+        // Block all UI elements until the change batteries.
+        toggleBatteryUnitControls(false);
+        ui->patientInfoBox->setEnabled(false);
 
-            break;
-        case CHECK_RESPONSE:
-            setTextMsg("CHECK RESPONSIVENESS.");
-            turnOnIndicator(RESPONSE_INDICATOR);
-            break;
-        case CALL_HELP:
-            setTextMsg("CALL HELP.");
-            turnOnIndicator(HELP_INDICATOR);
+        // Enable the button for switching batteries;
+        ui->changeBatteries->setEnabled(true);
 
-        case ATTACH_PADS:
-            // Check the UI whether the pads button is checked.
+        break;
+    case STAY_CALM:
+        setTextMsg("STAY CALM");
+        break;
+    case CHECK_RESPONSE:
+        setTextMsg("CHECK RESPONSIVENESS");
+        turnOnIndicator(RESPONSE_INDICATOR);
+        break;
+    case CALL_HELP:
+        setTextMsg("CALL HELP");
+        turnOnIndicator(HELP_INDICATOR);
+        break;
+    case ATTACH_PADS:
+        turnOnIndicator(PADS_INDICATOR);
+
+        // Check the UI whether the pads button is checked.
+        if (!ui->cprPadsAttached->isChecked())
+        {
+            setTextMsg("ATTACH DEFIB PADS");
 
             // Prompt the user to attach the pads if necessary.
-
-            // Tell the AED continue once the pads were attached.
-
-            break;
-        case STAND_CLEAR:
-            setTextMsg(QString("Stay away from the patient!"));
+            ui->cprPadsAttached->setEnabled(true);
+        }
+        else
+        {
+            setTextMsg("");
+            ui->cprPadsAttached->setEnabled(false);
+        }
         break;
+    case ANALYZING:
+        turnOnIndicator(CONTACT_INDICATOR);
+        setTextMsg("ANALYZING.");
 
-
-        case ANALYZING:
-            setTextMsg(QString("ANALYZING PATIENT."));
-        break;
-
-        case CHARGING:
-            setTextMsg(QString("Charging for shock"));
-        break;
-
-        case CPR:
-            ui->shallowPushButton->setDisabled(false);
-            ui->deepPushButton->setDisabled(false);
-        break;
-
-        case SHOCKING:
-            setTextMsg(QString(""));
-        break;
+        // TODO: Update ECG waveform.
+    break;
+    case NO_SHOCK_ADVISED:
+        turnOnIndicator(CONTACT_INDICATOR);
+        setTextMsg("NO SHOCK ADVISED");
+    break;
+    case SHOCK_ADVISED:
+        turnOnIndicator(CONTACT_INDICATOR);
+        setTextMsg("SHOCK ADVISED");
+    break;
+    case STAND_CLEAR:
+        turnOnIndicator(SHOCK_INDICATOR);
+        setTextMsg("STAND CLEAR");
+    break;
+    case SHOCKING:
+        turnOnIndicator(SHOCK_INDICATOR);
+        setTextMsg("SHOCK WILL BE DELIVERED IN 1, 2, 3...");
+    break;
+    case CPR:
+        turnOnIndicator(CPR_INDICATOR);
+        setTextMsg("START CPR");
+        ui->shallowPushButton->setEnabled(true);
+        ui->deepPushButton->setEnabled(true);
+    break;
+    default:
+        setTextMsg("");
+    break;
     }
 
     QApplication::processEvents();
@@ -387,8 +465,17 @@ void MainWindow::updateNumberOfShocks(int shocks)
     ui->shockCount->setText(QString("%1").arg(shocks, 2, 10, QChar('0')));
 }
 
-void MainWindow::on_cprPadsAction_toggled(bool checked)
+void MainWindow::on_cprPadsAttached_clicked(bool checked)
 {
-    emit setPadsAttached(checked);
+    ui->cprPadsAttached->setChecked(checked);
+    ui->padsAttachedIndicator->setChecked(checked);
+
+
+    if (device->getState() == ATTACH_PADS && checked)
+    {
+        // Operator is attaching the pads to the patient.
+        ui->cprPadsAttached->setEnabled(false);
+        device->notifyPadsAttached();
+    }
 }
 

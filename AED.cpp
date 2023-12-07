@@ -44,17 +44,19 @@ void AED::run()
     int random = QRandomGenerator::global()->bounded(100);
     if (random >= 90)
     {
+        state = SELF_TEST_FAIL;
         emit updateGUI(SELF_TEST_FAIL);
         return;
     }
     else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
     {
+        state = CHANGE_BATTERIES;
         emit updateGUI(CHANGE_BATTERIES);
         return;
     }
     else
     {
-         nextStep(SELF_TEST_SUCCESS, SLEEP, batteryUnitsWhenIdle);
+        nextStep(SELF_TEST_SUCCESS, SLEEP, batteryUnitsWhenIdle);
     }
 
     nextStep(STAY_CALM, SLEEP, batteryUnitsWhenIdle);
@@ -65,7 +67,15 @@ void AED::run()
     nextStep(ATTACH_PADS, ATTACH_PADS_TIME, batteryUnitsWhenIdle);
 
     // Keep spinning while the pads are not attached.
-    while (!padsAttached) {}
+    if (!padsAttached)
+    {
+        QMutexLocker locker(&padsAttachedMutex);
+        waitForPadsAttachement.wait(&padsAttachedMutex);
+    }
+    else
+    {
+        QThread::msleep(200);
+    }
 
     for (int i = 0; i < shockUntilHealthy; ++i)
     {
@@ -111,6 +121,7 @@ void AED::setGUI(MainWindow* mainWindow)
 // Going to the next step.
 void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
+    this->state = state;
     emit updateGUI(state);
 
     if (batteryUsed > 0)
@@ -152,11 +163,6 @@ AEDState AED::getState() const
     return this->state;
 }
 
-bool AED::getPadsAttached() const
-{
-    return this->padsAttached;
-}
-
 int AED::getBatteryLevel() const
 {
     return this->batteryLevel;
@@ -170,6 +176,12 @@ void AED::setPatientHeartCondition(int patientHeartCondition)
 void AED::setPadsAttached(bool padsAttached)
 {
     this->padsAttached = padsAttached;
+}
+
+void AED::notifyPadsAttached()
+{
+    QMutexLocker locker(&padsAttachedMutex);
+    waitForPadsAttachement.wakeOne();
 }
 
 void AED::setBatteryLevel(int level){
