@@ -101,33 +101,35 @@ void AED::run()
         QThread::msleep(SLEEP);
 
         // Normal rhythm. Turn off the device.
-        if (!shockable() && patientHeartCondition == SINUS_RHYTHM)
+        if (!shockNeeded && patientHeartCondition == SINUS_RHYTHM)
         {
             nextStep(ABORT, 0, 0);
             return;
         }
 
-        // Check if we have enough battery.
-        int shockJoule = shockCount >= 3 ? 3 : shockCount;
-        int batteryUnits = shockJoule * batteryUnitsPerShock;
-
-        if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
+        if (shockNeeded)
         {
-            //Indicate the user to change battery
-            nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
-            //Then abort
-            nextStep(ABORT, 0, 0);
-            return;
+            // Check if we have enough battery.
+            int shockJoule = shockCount >= 3 ? 3 : shockCount;
+            int batteryUnits = shockJoule * batteryUnitsPerShock;
+
+            if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
+            {
+                //Indicate the user to change battery
+                nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
+                //Then abort
+                nextStep(ABORT, 0, 0);
+                return;
+            }
+
+            nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
+            nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
+            nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
         }
 
-        nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
-        nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
-        nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
         nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
         nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
     }
-
-    nextStep(ABORT, 0, 0);
 }
 
 void AED::setGUI(MainWindow* mainWindow)

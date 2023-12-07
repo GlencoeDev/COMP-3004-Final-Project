@@ -9,7 +9,7 @@
 #define MAX_BATTERY_LEVEL 100
 #define SUFFICIENT_BATTERY_LEVEL 20
 
-#define SLEEP 3000
+#define SLEEP 1000
 #define SHOCKING_TIME 3000
 #define CPR_TIME 5000
 #define ATTACH_PADS_TIME 100
@@ -50,7 +50,6 @@ enum HeartState
     SINUS_RHYTHM, // Normal sinus rhythm
     VENTRICULAR_FIBRILLATION, // Ventricular fibrillation
     VENTRICULAR_TACHYCARDIA, // Ventricular tachycardia
-    ASYSTOLE
 };
 
 #endif

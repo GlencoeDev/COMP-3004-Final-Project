@@ -72,6 +72,7 @@ void MainWindow::addAED(AED* device)
 
     // Conect signals and slots.
     connect(this, SIGNAL(setPatientHeartCondition(int)), device, SLOT(setPatientHeartCondition(int)));
+    connect(this, SIGNAL(setStartWithAsystole(bool)), device, SLOT(setStartWithAsystole(bool)));
     connect(this, SIGNAL(setShockUntilHealthy(int)), device, SLOT(setShockUntilHealthy(int)));
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
     connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
@@ -162,7 +163,7 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
         ui->numOfRunsSelector->setEnabled(true);
-        toggleBatteryUnitControls(false);
+        toggleBatteryUnitControls(true);
 
         ui->padsIndicator->setEnabled(true);
 
@@ -478,9 +479,9 @@ void MainWindow::updateGUI(int state)
     case ABORT:
         setTextMsg("");
         //Turn off the device
-        on_powerBtn_toggled(false);
+        ui->powerBtn->toggle();
         ui->selfCheckIndicator->setEnabled(false);
-        //Turn off all indicators
+        // Turn off all indicators
         turnOffAllIndicators();
     break;
 
