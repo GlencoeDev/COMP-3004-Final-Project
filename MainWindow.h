@@ -44,6 +44,7 @@ public slots:
 signals:
     void setPatientHeartCondition(int patientHeartCondition);
     void setShockUntilHealthy(int numberOfShocks);
+    void setStartWithAsystole(bool checked);
     void setPadsAttached(bool attached);
     void notifyPadsAttached();
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);

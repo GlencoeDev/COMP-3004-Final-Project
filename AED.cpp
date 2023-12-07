@@ -77,11 +77,27 @@ void AED::run()
         QThread::msleep(200);
     }
 
-    for (int i = 0; i < shockUntilHealthy; ++i)
+    // One extra round of CPR before delivering all shocks.
+    if (startWithAsystole)
+    {
+        shockUntilHealthy++;
+    }
+
+    for (int i = 0; i <= shockUntilHealthy; ++i)
     {
         nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
 
-        emit updateGUI(shockable() ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
+        // Change patient to healthy once all shocks have been delivered.
+        if (shockable() && i == shockUntilHealthy)
+        {
+           // Update patient heart condition to healthy since all shocks have been delivered.
+           patientHeartCondition = SINUS_RHYTHM;
+           emit updatePatientCondition(SINUS_RHYTHM);
+        }
+
+        bool shockNeeded = shockable() && (i > 0 || !startWithAsystole);
+
+        emit updateGUI(shockNeeded ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
         QThread::msleep(SLEEP);
 
         // Normal rhythm. Turn off the device.
@@ -90,6 +106,7 @@ void AED::run()
             nextStep(ABORT, 0, 0);
             return;
         }
+
         // Check if we have enough battery.
         int shockJoule = shockCount >= 3 ? 3 : shockCount;
         int batteryUnits = shockJoule * batteryUnitsPerShock;
@@ -203,4 +220,9 @@ void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdl
 
 void AED::setShockUntilHealthy(int shockUntilHealthy){
     this->shockUntilHealthy = shockUntilHealthy;
+}
+
+void AED::setStartWithAsystole(bool checked)
+{
+    this->startWithAsystole = checked;
 }

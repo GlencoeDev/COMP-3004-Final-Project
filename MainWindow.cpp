@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Disable by default since patient is healthy by default.
     ui->numOfRunsSelector->setEnabled(false);
+    ui->startWithAsystole->setEnabled(false);
 
     // Disable the stroke buttons.
     // TODO: Only re-enable stroke buttons.
@@ -263,10 +264,12 @@ void MainWindow::on_conditionSelector_currentIndexChanged(int index)
     {
         ui->numOfRunsSelector->setValue(1);
         ui->numOfRunsSelector->setEnabled(false);
+        ui->startWithAsystole->setEnabled(false);
     }
     else
     {
         ui->numOfRunsSelector->setEnabled(true);
+        ui->startWithAsystole->setEnabled(true);
     }
 }
 
@@ -349,6 +352,7 @@ void MainWindow::setPatientCondition()
     // Emit signals to the AED device to set patient condtions.
     emit setPatientHeartCondition(patientHeartCondition);
     emit setShockUntilHealthy(numberOfShock);
+    emit setStartWithAsystole(ui->startWithAsystole->isChecked());
 }
 
 void MainWindow::updateGUI(int state)
@@ -495,7 +499,7 @@ void MainWindow::updatePatientCondition(int condition)
 
 void MainWindow::updateNumberOfShocks(int shocks)
 {
-    //Set number of shocks
+    // Set number of shocks
     ui->shockCount->setText(QString("SHOCKS: %1").arg(shocks, 2, 10, QChar('0')));
 
 }

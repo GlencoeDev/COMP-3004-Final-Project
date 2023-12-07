@@ -33,7 +33,6 @@ public:
     void setBatteryLevel(int level);
     void setGUI(MainWindow* mainWindow);
 
-
 public slots:
     void powerOn();
 
@@ -43,6 +42,7 @@ public slots:
     void setShockUntilHealthy(int shockUntilHealthy);
     void setPadsAttached(bool padsAttached);
     void notifyPadsAttached();
+    void setStartWithAsystole(bool checked);
 
 private slots:
     void cleanUp();
@@ -58,6 +58,7 @@ private:
     bool shockable() const;
     void run();
     HeartState patientHeartCondition;
+    bool startWithAsystole;
     AEDState state;
     bool padsAttached;
     int batteryLevel;

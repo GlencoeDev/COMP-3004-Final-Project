@@ -718,6 +718,9 @@ border-bottom-right-radius: 5px;</string>
         <string/>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>10</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
@@ -755,7 +758,6 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -790,11 +792,6 @@ background: transparent;
           </item>
           <item>
            <property name="text">
-            <string>Asystole</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>Ventricular Fibrillation</string>
            </property>
           </item>
@@ -803,6 +800,16 @@ background: transparent;
             <string>Ventricular Tachycardia</string>
            </property>
           </item>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QCheckBox" name="startWithAsystole">
+          <property name="styleSheet">
+           <string notr="true">margin-left: 5px;</string>
+          </property>
+          <property name="text">
+           <string>Start with Asystole</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -887,7 +894,6 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1189,7 +1195,6 @@ background: transparent;</string>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
