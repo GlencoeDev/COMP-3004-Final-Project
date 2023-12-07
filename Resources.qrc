@@ -13,5 +13,6 @@
         <file>Icons/audioIcon.png</file>
         <file>Icons/pads_indicator_off.png</file>
         <file>Icons/pads_indicator_on.png</file>
+        <file>Icons/ECS_SINUS.png</file>
     </qresource>
 </RCC>

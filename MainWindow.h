@@ -57,6 +57,8 @@ private slots:
     void on_deepPushButton_clicked();
     void on_cprPadsAttached_clicked(bool checked);
 
+    void on_changeBatteries_clicked();
+
 private:
     Ui::MainWindow *ui;
 

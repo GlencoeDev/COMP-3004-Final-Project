@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // Disallow clicking on the self-test indicator.
-    ui->selftCheckIndicator->setEnabled(false);
+    ui->selfCheckIndicator->setEnabled(false);
 
     // Set initial CPR depth.
     setCPRDepth(0.0);
@@ -165,15 +165,13 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         ui->padsIndicator->setEnabled(true);
 
-        ui->selftCheckIndicator->setChecked(false);
+        ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
 
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
         timeUpdateCounter->start(5000);
 
-        // Terminate the running thread
-        emit terminate();
     }
 }
 
@@ -252,7 +250,7 @@ void MainWindow::resetElapsedTime()
 {
     elapsedTimeSec = 0;
     ui->elapsedTime->setText("00:00");
-    ui->shockCount->setText("00");
+    ui->shockCount->setText("SHOCKS: 0");
 
     QApplication::processEvents();
 }
@@ -360,28 +358,31 @@ void MainWindow::updateGUI(int state)
     {
     case OFF:
         setTextMsg("");
-        ui->selftCheckIndicator->setChecked(false);
+        ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
         currentStep = -1;
-        break;
+    break;
+
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED.");
-        ui->selftCheckIndicator->setChecked(false);
+        ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
-        break;
+    break;
+
     case SELF_TEST_SUCCESS:
         setTextMsg("UNIT OK.");
-        ui->selftCheckIndicator->setChecked(true);
+        ui->selfCheckIndicator->setChecked(true);
         ui->powerBtn->setChecked(true);
 
         // Set up the time counter.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
         timeUpdateCounter->start(1000);
 
-        break;
+    break;
+
     case CHANGE_BATTERIES:
         setTextMsg("CHANGE BATTERIES");
-        ui->selftCheckIndicator->setEnabled(false);
+        ui->selfCheckIndicator->setEnabled(false);
 
         // Block all UI elements until the change batteries.
         toggleBatteryUnitControls(false);
@@ -390,21 +391,24 @@ void MainWindow::updateGUI(int state)
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
 
-        break;
+    break;
+
     case STAY_CALM:
         setTextMsg("STAY CALM");
-        break;
+    break;
+
     case CHECK_RESPONSE:
         setTextMsg("CHECK RESPONSIVENESS");
         turnOnIndicator(RESPONSE_INDICATOR);
-        break;
+    break;
+
     case CALL_HELP:
         setTextMsg("CALL HELP");
         turnOnIndicator(HELP_INDICATOR);
-        break;
+    break;
+
     case ATTACH_PADS:
         turnOnIndicator(PADS_INDICATOR);
-
         // Check the UI whether the pads button is checked.
         if (!ui->cprPadsAttached->isChecked())
         {
@@ -418,35 +422,64 @@ void MainWindow::updateGUI(int state)
             setTextMsg("");
             ui->cprPadsAttached->setEnabled(false);
         }
-        break;
+    break;
+
     case ANALYZING:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("ANALYZING.");
 
         // TODO: Update ECG waveform.
     break;
+
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("NO SHOCK ADVISED");
     break;
+
     case SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("SHOCK ADVISED");
     break;
+
     case STAND_CLEAR:
         turnOnIndicator(SHOCK_INDICATOR);
         setTextMsg("STAND CLEAR");
     break;
+
     case SHOCKING:
         turnOnIndicator(SHOCK_INDICATOR);
-        setTextMsg("SHOCK WILL BE DELIVERED IN 1, 2, 3...");
+        setTextMsg("SHOCK WILL BE DELIVERED IN 1, 2, 3");
     break;
+
+    case SHOCK_DELIVERED:
+        turnOnIndicator(SHOCK_INDICATOR);
+        setTextMsg("SHOCK DELIVERED");
+    break;
+
     case CPR:
         turnOnIndicator(CPR_INDICATOR);
         setTextMsg("START CPR");
         ui->shallowPushButton->setEnabled(true);
         ui->deepPushButton->setEnabled(true);
     break;
+
+    case STOP_CPR:
+        setTextMsg("STOP CPR");
+        //Disable CPR button
+        ui -> shallowPushButton -> setEnabled(false);
+        ui -> deepPushButton -> setEnabled(false);
+        setCPRDepth(0.0);
+    break;
+
+    case ABORT:
+        setTextMsg("");
+        //Turn off the device
+        on_powerBtn_toggled(false);
+        ui->selfCheckIndicator->setEnabled(false);
+        //Turn off all indicators
+        turnOffAllIndicators();
+    break;
+
     default:
         setTextMsg("");
     break;
@@ -462,7 +495,9 @@ void MainWindow::updatePatientCondition(int condition)
 
 void MainWindow::updateNumberOfShocks(int shocks)
 {
-    ui->shockCount->setText(QString("%1").arg(shocks, 2, 10, QChar('0')));
+    //Set number of shocks
+    ui->shockCount->setText(QString("SHOCKS: %1").arg(shocks, 2, 10, QChar('0')));
+
 }
 
 void MainWindow::on_cprPadsAttached_clicked(bool checked)
@@ -477,5 +512,12 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
         ui->cprPadsAttached->setEnabled(false);
         device->notifyPadsAttached();
     }
+}
+
+
+void MainWindow::on_changeBatteries_clicked()
+{
+    //Reset the battery to max battery level
+    ui -> startingBatteryLevel -> setValue(MAX_BATTERY_LEVEL);
 }
 

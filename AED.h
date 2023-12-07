@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <QObject>
 #include <QWaitCondition>
+#include <QMutexLocker>
+#include <QMutex>
 
 #ifndef AED_H
 #define AED_H

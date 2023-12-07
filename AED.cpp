@@ -96,7 +96,10 @@ void AED::run()
 
         if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
         {
-            nextStep(CHANGE_BATTERIES, 0, 0);
+            //Indicate the user to change battery
+            nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
+            //Then abort
+            nextStep(ABORT, 0, 0);
             return;
         }
 
@@ -106,6 +109,8 @@ void AED::run()
         nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
         nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
     }
+
+    nextStep(ABORT, 0, 0);
 }
 
 void AED::setGUI(MainWindow* mainWindow)
