@@ -86,15 +86,15 @@ void AED::run()
     }
     else
     {
-        nextStep(SELF_TEST_SUCCESS, SLEEP, batteryUnitsWhenIdle);
+        nextStep(SELF_TEST_SUCCESS, SLEEP, 0);
     }
 
-    nextStep(STAY_CALM, SLEEP, batteryUnitsWhenIdle);
-    nextStep(CHECK_RESPONSE, SLEEP, batteryUnitsWhenIdle);
-    nextStep(CALL_HELP, SLEEP, batteryUnitsWhenIdle);
+    nextStep(STAY_CALM, SLEEP, 0);
+    nextStep(CHECK_RESPONSE, SLEEP, 0);
+    nextStep(CALL_HELP, SLEEP, 0);
 
     // Ask the user to attach the pads.
-    nextStep(ATTACH_PADS, ATTACH_PADS_TIME, batteryUnitsWhenIdle);
+    nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
 
     checkPadsAttached();
 
@@ -116,7 +116,7 @@ void AED::run()
            emit updatePatientCondition(SINUS_RHYTHM);
         }
 
-        nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
+        nextStep(ANALYZING, ANALYZING_TIME, 0);
 
 
 
@@ -152,13 +152,13 @@ void AED::run()
                 return;
             }
 
-            nextStep(STAND_CLEAR, SLEEP, batteryUnitsWhenIdle);
-            nextStep(SHOCKING, SHOCKING_TIME, batteryUnitsWhenIdle);
+            nextStep(STAND_CLEAR, SLEEP, 0);
+            nextStep(SHOCKING, SHOCKING_TIME, 0);
             nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
         }
 
-        nextStep(CPR, CPR_TIME, batteryUnitsWhenIdle * (CPR_TIME/SLEEP));
-        nextStep(STOP_CPR, SLEEP, batteryUnitsWhenIdle);
+        nextStep(CPR, CPR_TIME, 0);
+        nextStep(STOP_CPR, SLEEP, 0);
     }
 }
 

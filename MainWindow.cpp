@@ -250,6 +250,13 @@ void MainWindow::updateElapsedTime()
     QString timerStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui->elapsedTime->setText(timerStr);
 
+    //Decrease battery
+    int currentBatteryLevel = ui -> startingBatteryLevel -> value();
+    int batteryWhenIdle = ui -> batteryWhenIdle -> value();
+    currentBatteryLevel -= batteryWhenIdle;
+    emit setBatteryLevel(currentBatteryLevel);
+    updateBatteryLevel(currentBatteryLevel);
+
     QApplication::processEvents();
 }
 
