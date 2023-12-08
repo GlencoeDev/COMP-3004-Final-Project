@@ -281,8 +281,8 @@ border-radius: 0;</string>
       <widget class="QLabel" name="ecgDisplay">
        <property name="geometry">
         <rect>
-         <x>15</x>
-         <y>35</y>
+         <x>20</x>
+         <y>50</y>
          <width>220</width>
          <height>50</height>
         </rect>
@@ -293,6 +293,12 @@ background-image: url(/ICONS/ECG_SINUS.png)</string>
        </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="Resources.qrc">:/Icons/ECS_SINUS.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
