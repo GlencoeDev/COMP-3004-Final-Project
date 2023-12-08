@@ -764,6 +764,7 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -903,6 +904,7 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1161,6 +1163,7 @@ color: black;</string>
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1177,7 +1180,7 @@ background: transparent;</string>
         <item>
          <widget class="QCheckBox" name="connectionLoss">
           <property name="text">
-           <string>Connection Loss</string>
+           <string>Connection Lost</string>
           </property>
          </widget>
         </item>
@@ -1345,6 +1348,7 @@ background: transparent;</string>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>

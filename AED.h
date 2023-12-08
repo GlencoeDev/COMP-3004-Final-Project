@@ -44,7 +44,7 @@ public slots:
     void setStartWithAsystole(bool checked);
     void setLostConnection(bool simulateConnectionLoss);
     void setBatteryLevel(int level);
-
+    void notifyReconnection();
 private slots:
     void cleanUp();
 signals:
@@ -53,6 +53,7 @@ signals:
     void batteryChanged(int level);
     void updateShockCount(int count);
     void updatePatientCondition(int condition);
+    void connectionLost();
 
 private:
     void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);

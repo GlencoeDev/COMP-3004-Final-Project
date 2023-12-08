@@ -9,7 +9,7 @@
 #define MAX_BATTERY_LEVEL 100
 #define SUFFICIENT_BATTERY_LEVEL 20
 
-#define SLEEP 3000
+#define SLEEP 500
 #define SHOCKING_TIME 3000
 #define CPR_TIME 10000
 #define ATTACH_PADS_TIME 100
@@ -23,6 +23,7 @@
 #define CPR_INDICATOR 4
 #define SHOCK_INDICATOR 5
 
+#define RANDOM_BOUND 1
 // Device state.
 enum AEDState
 {

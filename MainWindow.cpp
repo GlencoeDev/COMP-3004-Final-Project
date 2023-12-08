@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->shallowPushButton->setEnabled(false);
     ui->deepPushButton->setEnabled(false);
     ui->changeBatteries->setEnabled(false);
+    ui->reconnectBtn->setEnabled(false);
 
     // Set up timer for flashing step indicator.
     indicatorTimer = new QTimer(this);
@@ -77,8 +78,10 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
     connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
-    connect(this, SIGNAL(setBatteryLevel(int)), device, SIGNAL(setBatteryLevel(int)));
+    connect(this, &MainWindow::setBatteryLevel, device, &AED::setBatteryLevel);
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
+    connect(this, &MainWindow::notifyReconnection, device, &AED::notifyReconnection);
+    connect(this, &MainWindow::setLostConnection, device, &AED::setLostConnection);
 }
 
 void MainWindow::turnOnIndicator(int index)
@@ -147,7 +150,6 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         toggleBatteryUnitControls(false);
 
         ui->padsIndicator->setEnabled(false);
-
         // Set the battery spec for the device.
         setDeviceBatterySpecs();
 
@@ -439,9 +441,10 @@ void MainWindow::updateGUI(int state)
         // TODO: Update ECG waveform.
     break;
 
-//    case LOST_CONNECTION:
-//        turnOnIndicator("CONNECTION LOST");
-//    break;
+    case LOST_CONNECTION:
+        //turnOnIndicator("CONNECTION LOST");
+        setTextMsg("LOST CONNECTION! RECONNECT");
+    break;
 
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
@@ -539,6 +542,15 @@ void MainWindow::on_reconnectBtn_clicked()
 {
     // Reset connection setting.
     ui->connectionLoss->setChecked(false);
+
+    //Disable reconnectBtn
+    ui -> reconnectBtn -> setEnabled(false);
     emit setLostConnection(false);
+    device -> notifyReconnection();
 }
 
+void MainWindow::connectionLost()
+{
+    //Enable the reconnection button to click
+    ui -> reconnectBtn -> setEnabled(true);
+}

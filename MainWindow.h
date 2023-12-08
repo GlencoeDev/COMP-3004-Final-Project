@@ -52,6 +52,7 @@ signals:
     void powerOn();
     void setLostConnection(bool simulateConnectionLoss);
     void setBatteryLevel(int level);
+    void notifyReconnection();
 
 private slots:
     void on_powerBtn_toggled(bool checked);
@@ -61,6 +62,7 @@ private slots:
     void on_cprPadsAttached_clicked(bool checked);
     void on_changeBatteries_clicked();
     void on_reconnectBtn_clicked();
+    void connectionLost();
 
 private:
     Ui::MainWindow *ui;

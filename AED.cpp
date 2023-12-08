@@ -55,9 +55,11 @@ void AED::setLostConnection(bool simulateConnectionLoss)
 void AED::checkConnection()
 {
     // Simulate connection loss if such testing requirement was selected with ~33% probability.
-    int random = QRandomGenerator::global()->bounded(2);
-    if (loseConnection && random == 2)
+    int random = QRandomGenerator::global()->bounded(RANDOM_BOUND);
+    if (loseConnection && random == 0)
     {
+        emit connectionLost();
+        nextStep(LOST_CONNECTION, 0, 0);
         QMutexLocker locker(&restoreConnectionMutex);
         waitForConnection.wait(&restoreConnectionMutex);
     }
@@ -104,6 +106,7 @@ void AED::run()
 
     for (int i = 0; i <= shockUntilHealthy; ++i)
     {
+        checkConnection();
         nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
 
         // Change patient to healthy once all shocks have been delivered.
@@ -163,6 +166,7 @@ void AED::setGUI(MainWindow* mainWindow)
     connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
     connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
+    connect(this, SIGNAL(connectionLost()), gui, SLOT(connectionLost()));
 }
 
 // Going to the next step.
@@ -231,6 +235,12 @@ void AED::notifyPadsAttached()
     waitForPadsAttachement.wakeOne();
 }
 
+void AED::notifyReconnection()
+{
+    QMutexLocker locker(&restoreConnectionMutex);
+    waitForConnection.wakeOne();
+
+}
 void AED::setBatteryLevel(int level){
     batteryLevel = level;
     emit batteryChanged(level);
