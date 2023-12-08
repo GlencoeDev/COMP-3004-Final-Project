@@ -294,9 +294,6 @@ background-image: url(/ICONS/ECG_SINUS.png)</string>
        <property name="text">
         <string/>
        </property>
-       <property name="pixmap">
-        <pixmap resource="Resources.qrc">:/Icons/ECS_SINUS.png</pixmap>
-       </property>
        <property name="scaledContents">
         <bool>true</bool>
        </property>

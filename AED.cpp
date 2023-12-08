@@ -106,8 +106,7 @@ void AED::run()
 
     for (int i = 0; i <= shockUntilHealthy; ++i)
     {
-        checkConnection();
-        nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
+
 
         // Change patient to healthy once all shocks have been delivered.
         if (shockable() && i == shockUntilHealthy)
@@ -116,6 +115,10 @@ void AED::run()
            patientHeartCondition = SINUS_RHYTHM;
            emit updatePatientCondition(SINUS_RHYTHM);
         }
+
+        nextStep(ANALYZING, ANALYZING_TIME, batteryUnitsWhenIdle);
+
+
 
         bool shockNeeded = shockable() && (i > 0 || !startWithAsystole);
 
@@ -129,7 +132,8 @@ void AED::run()
             return;
         }
 
-        // Simulate connection loss.
+        //Simulating connection lost
+        checkConnection();
 
 
 

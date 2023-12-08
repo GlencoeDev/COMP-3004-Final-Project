@@ -361,6 +361,29 @@ void MainWindow::setPatientCondition()
     emit setStartWithAsystole(ui->startWithAsystole->isChecked());
 }
 
+void MainWindow::updateECGDisplay(const QString& image)
+{
+    QPixmap pixmap;
+    pixmap.load(image);
+    ui -> ecgDisplay -> setPixmap(pixmap);
+}
+void MainWindow::updateECGDisplay(HeartState state)
+{
+    switch (state)
+    {
+    case SINUS_RHYTHM:
+        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+    break;
+
+    case VENTRICULAR_FIBRILLATION:
+        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+    break;
+
+    case VENTRICULAR_TACHYCARDIA:
+        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+    break;
+    }
+}
 void MainWindow::updateGUI(int state)
 {
     AEDState theState = (AEDState) state;
@@ -439,6 +462,7 @@ void MainWindow::updateGUI(int state)
         setTextMsg("ANALYZING.");
 
         // TODO: Update ECG waveform.
+        updateECGDisplay(device -> getPatientHeartCondition());
     break;
 
     case LOST_CONNECTION:
