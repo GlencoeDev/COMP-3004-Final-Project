@@ -372,15 +372,15 @@ void MainWindow::updateECGDisplay(HeartState state)
     switch (state)
     {
     case SINUS_RHYTHM:
-        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
     break;
 
     case VENTRICULAR_FIBRILLATION:
-        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
     break;
 
     case VENTRICULAR_TACHYCARDIA:
-        updateECGDisplay(QString("./Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
     break;
     }
 }
