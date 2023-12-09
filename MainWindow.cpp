@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Disallow clicking on the self-test indicator.
     ui->selfCheckIndicator->setEnabled(false);
+    ui->padsIndicator->setEnabled(false);
 
     // Set initial CPR depth.
     setCPRDepth(0.0);
@@ -149,12 +150,14 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         ui->numOfRunsSelector->setEnabled(false);
         toggleBatteryUnitControls(false);
 
-        ui->padsIndicator->setEnabled(false);
         // Set the battery spec for the device.
         setDeviceBatterySpecs();
 
         // Set patient heart condition.
         setPatientCondition();
+
+        // Disable CPR pads.
+        ui->cprPadsAttached->setEnabled(false);
 
         // Set other conditions prior to running the device.
         emit setPadsAttached(ui->cprPadsAttached->isChecked());
@@ -170,7 +173,8 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         ui->numOfRunsSelector->setEnabled(true);
         toggleBatteryUnitControls(true);
 
-        ui->padsIndicator->setEnabled(true);
+        ui->cprPadsAttached->setChecked(false);
+        ui->cprPadsAttached->setEnabled(true);
 
         ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
@@ -251,8 +255,8 @@ void MainWindow::updateElapsedTime()
     ui->elapsedTime->setText(timerStr);
 
     //Decrease battery
-    int currentBatteryLevel = ui -> startingBatteryLevel -> value();
-    int batteryWhenIdle = ui -> batteryWhenIdle -> value();
+    int currentBatteryLevel = ui->startingBatteryLevel->value();
+    int batteryWhenIdle = ui->batteryWhenIdle->value();
     currentBatteryLevel -= batteryWhenIdle;
     emit setBatteryLevel(currentBatteryLevel);
     updateBatteryLevel(currentBatteryLevel);
@@ -372,8 +376,9 @@ void MainWindow::updateECGDisplay(const QString& image)
 {
     QPixmap pixmap;
     pixmap.load(image);
-    ui -> ecgDisplay -> setPixmap(pixmap);
+    ui->ecgDisplay->setPixmap(pixmap);
 }
+
 void MainWindow::updateECGDisplay(HeartState state)
 {
     switch (state)
@@ -391,6 +396,7 @@ void MainWindow::updateECGDisplay(HeartState state)
     break;
     }
 }
+
 void MainWindow::updateGUI(int state)
 {
     AEDState theState = (AEDState) state;
@@ -430,7 +436,6 @@ void MainWindow::updateGUI(int state)
 
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
-
     break;
 
     case STAY_CALM:
@@ -467,9 +472,6 @@ void MainWindow::updateGUI(int state)
     case ANALYZING:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("ANALYZING.");
-
-        // TODO: Update ECG waveform.
-        updateECGDisplay(device -> getPatientHeartCondition());
     break;
 
     case LOST_CONNECTION:
@@ -480,11 +482,17 @@ void MainWindow::updateGUI(int state)
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("NO SHOCK ADVISED");
+
+        // TODO: Update ECG waveform.
+        updateECGDisplay(device->getPatientHeartCondition());
     break;
 
     case SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("SHOCK ADVISED");
+
+        // TODO: Update ECG waveform.
+        updateECGDisplay(device->getPatientHeartCondition());
     break;
 
     case STAND_CLEAR:
@@ -519,11 +527,16 @@ void MainWindow::updateGUI(int state)
 
     case ABORT:
         setTextMsg("");
+
         //Turn off the device
         ui->powerBtn->toggle();
         ui->selfCheckIndicator->setEnabled(false);
+
         // Turn off all indicators
         turnOffAllIndicators();
+
+        // Remove ECG waveforms.
+        ui->ecgDisplay->clear();
     break;
 
     default:
@@ -551,7 +564,6 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
     ui->cprPadsAttached->setChecked(checked);
     ui->padsAttachedIndicator->setChecked(checked);
 
-
     if (device->getState() == ATTACH_PADS && checked)
     {
         // Operator is attaching the pads to the patient.
@@ -575,13 +587,13 @@ void MainWindow::on_reconnectBtn_clicked()
     ui->connectionLoss->setChecked(false);
 
     //Disable reconnectBtn
-    ui -> reconnectBtn -> setEnabled(false);
+    ui->reconnectBtn->setEnabled(false);
     emit setLostConnection(false);
-    device -> notifyReconnection();
+    device->notifyReconnection();
 }
 
 void MainWindow::connectionLost()
 {
     //Enable the reconnection button to click
-    ui -> reconnectBtn -> setEnabled(true);
+    ui->reconnectBtn->setEnabled(true);
 }

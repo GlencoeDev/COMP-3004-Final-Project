@@ -41,8 +41,6 @@ public slots:
     void updatePatientCondition(int condition);
     void updateNumberOfShocks(int shocks);
 
-
-
 signals:
     void setPatientHeartCondition(int patientHeartCondition);
     void setShockUntilHealthy(int numberOfShocks);
@@ -82,6 +80,7 @@ private:
     //ECG Display updating
     void updateECGDisplay(HeartState state);
     void updateECGDisplay(const QString& image);
+
     // Keep a list of the indicators shoing current AED operation step.
     QList<QPushButton*> stepIndicators;
 
