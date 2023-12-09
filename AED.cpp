@@ -39,6 +39,7 @@ void AED::checkPadsAttached()
     {
         QMutexLocker locker(&padsAttachedMutex);
         waitForPadsAttachement.wait(&padsAttachedMutex);
+        padsAttached = true;
     }
     else
     {
@@ -58,7 +59,6 @@ void AED::checkConnection()
     int random = QRandomGenerator::global()->bounded(RANDOM_BOUND);
     if (loseConnection && random == 0)
     {
-        emit connectionLost();
         nextStep(LOST_CONNECTION, 0, 0);
         QMutexLocker locker(&restoreConnectionMutex);
         waitForConnection.wait(&restoreConnectionMutex);
@@ -164,7 +164,6 @@ void AED::setGUI(MainWindow* mainWindow)
     connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
     connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
-    connect(this, SIGNAL(connectionLost()), gui, SLOT(connectionLost()));
 }
 
 // Going to the next step.
@@ -229,6 +228,7 @@ void AED::setPadsAttached(bool padsAttached)
 
 void AED::notifyPadsAttached()
 {
+    padsAttached = true;
     QMutexLocker locker(&padsAttachedMutex);
     waitForPadsAttachement.wakeOne();
 }

@@ -62,7 +62,6 @@ private slots:
     void on_cprPadsAttached_clicked(bool checked);
     void on_changeBatteries_clicked();
     void on_reconnectBtn_clicked();
-    void connectionLost();
 
 private:
     Ui::MainWindow *ui;

@@ -150,14 +150,18 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         ui->numOfRunsSelector->setEnabled(false);
         toggleBatteryUnitControls(false);
 
+        // Disable loss connection selector.
+        ui->connectionLoss->setEnabled(false);
+
+        // Disable pads selector.
+        ui->padsSelector->setEnabled(false);
+
         // Set the battery spec for the device.
         setDeviceBatterySpecs();
 
         // Set patient heart condition.
         setPatientCondition();
 
-        // Disable CPR pads.
-        ui->cprPadsAttached->setEnabled(false);
 
         // Set other conditions prior to running the device.
         emit setPadsAttached(ui->cprPadsAttached->isChecked());
@@ -175,9 +179,16 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         ui->cprPadsAttached->setChecked(false);
         ui->cprPadsAttached->setEnabled(true);
+        ui->padsIndicator->setChecked(false);
 
         ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
+
+        // Disable pads selector.
+        ui->padsSelector->setEnabled(true);
+
+        // Re-enable loss connection selector.
+        ui->connectionLoss->setEnabled(true);
 
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
@@ -384,15 +395,15 @@ void MainWindow::updateECGDisplay(HeartState state)
     switch (state)
     {
     case SINUS_RHYTHM:
-        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString("://Icons/ECG_SINUS.png"));
     break;
 
     case VENTRICULAR_FIBRILLATION:
-        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString("://Icons/ventricullar_fibrillation.png"));
     break;
 
     case VENTRICULAR_TACHYCARDIA:
-        updateECGDisplay(QString(":/Icons/ECG_SINUS.png"));
+        updateECGDisplay(QString("://Icons/ventricular_tachycardia.png"));
     break;
     }
 }
@@ -459,6 +470,9 @@ void MainWindow::updateGUI(int state)
         {
             setTextMsg("ATTACH DEFIB PADS");
 
+            // Allow user to select pads.
+            ui->padsSelector->setEnabled(true);
+
             // Prompt the user to attach the pads if necessary.
             ui->cprPadsAttached->setEnabled(true);
         }
@@ -475,16 +489,23 @@ void MainWindow::updateGUI(int state)
     break;
 
     case LOST_CONNECTION:
-        //turnOnIndicator("CONNECTION LOST");
-        setTextMsg("LOST CONNECTION! RECONNECT");
+        setTextMsg("PLUG IN CABLE");
+        ui->reconnectBtn->setEnabled(true);
     break;
 
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("NO SHOCK ADVISED");
 
-        // TODO: Update ECG waveform.
-        updateECGDisplay(device->getPatientHeartCondition());
+        if (ui->startWithAsystole->isChecked() &&
+            device->getPatientHeartCondition() != SINUS_RHYTHM)
+        {
+            updateECGDisplay("://Icons/asystole.png");
+        }
+        else
+        {
+            updateECGDisplay("://Icons/ECG_SINUS.png");
+        }
     break;
 
     case SHOCK_ADVISED:
@@ -564,11 +585,30 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
     ui->cprPadsAttached->setChecked(checked);
     ui->padsAttachedIndicator->setChecked(checked);
 
-    if (device->getState() == ATTACH_PADS && checked)
+    if (device->getState() <= ATTACH_PADS && checked)
     {
-        // Operator is attaching the pads to the patient.
-        ui->cprPadsAttached->setEnabled(false);
-        device->notifyPadsAttached();
+        if (device->getState() > OFF)
+        {
+            // Disable selector once the pads were attached.
+            ui->cprPadsAttached->setEnabled(false);
+        }
+
+        if (device->getState() == ATTACH_PADS)
+        {
+            // Display the kind of pads that were attached.
+            bool adultPads = ui->padsSelector->currentIndex() == 0;
+            setTextMsg(QString("%1 PADS").arg(adultPads ? "ADULT" : "PEDIATRIC"));
+
+            // Keep the pads indicator message for some time.
+            QTimer::singleShot(1000, this, [this]() {
+                // Operator is attaching the pads to the patient.
+                this->device->notifyPadsAttached();
+            });
+        }
+        else
+        {
+            this->device->notifyPadsAttached();
+        }
     }
 }
 
@@ -586,14 +626,8 @@ void MainWindow::on_reconnectBtn_clicked()
     // Reset connection setting.
     ui->connectionLoss->setChecked(false);
 
-    //Disable reconnectBtn
+    // Disable reconnectBtn.
     ui->reconnectBtn->setEnabled(false);
-    emit setLostConnection(false);
+    emit setLostConnection(true);
     device->notifyReconnection();
-}
-
-void MainWindow::connectionLost()
-{
-    //Enable the reconnection button to click
-    ui->reconnectBtn->setEnabled(true);
 }

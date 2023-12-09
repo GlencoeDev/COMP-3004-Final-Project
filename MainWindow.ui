@@ -761,7 +761,6 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -809,7 +808,8 @@ background: transparent;
         <item alignment="Qt::AlignLeft">
          <widget class="QCheckBox" name="startWithAsystole">
           <property name="styleSheet">
-           <string notr="true">margin-left: 5px;</string>
+           <string notr="true">color: black;
+margin-left: 5px;</string>
           </property>
           <property name="text">
            <string>Start with Asystole</string>
@@ -901,7 +901,6 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1160,7 +1159,6 @@ color: black;</string>
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1176,6 +1174,9 @@ background: transparent;</string>
         </item>
         <item>
          <widget class="QCheckBox" name="connectionLoss">
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
           <property name="text">
            <string>Connection Lost</string>
           </property>
@@ -1185,6 +1186,9 @@ background: transparent;</string>
          <widget class="QPushButton" name="reconnectBtn">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
           </property>
           <property name="text">
            <string>Reconnect</string>
@@ -1203,6 +1207,42 @@ background: transparent;</string>
         </size>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>16</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border: 0;
+color: black;
+background: transparent;</string>
+          </property>
+          <property name="text">
+           <string>Pads Selector</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="padsSelector">
+          <property name="styleSheet">
+           <string notr="true">color: black;</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>Adult</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Pediatric</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QToolButton" name="cprPadsAttached">
           <property name="toolTip">
@@ -1345,7 +1385,6 @@ background: transparent;</string>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1355,7 +1394,7 @@ background: transparent;
 color: black;</string>
           </property>
           <property name="text">
-           <string>Audio Message</string>
+           <string/>
           </property>
          </widget>
         </item>

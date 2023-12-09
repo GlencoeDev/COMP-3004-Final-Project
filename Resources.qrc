@@ -14,5 +14,8 @@
         <file>Icons/pads_indicator_off.png</file>
         <file>Icons/pads_indicator_on.png</file>
         <file>Icons/ECG_SINUS.png</file>
+        <file>Icons/asystole.png</file>
+        <file>Icons/ventricullar_fibrillation.png</file>
+        <file>Icons/ventricular_tachycardia.png</file>
     </qresource>
 </RCC>
