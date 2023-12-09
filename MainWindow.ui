@@ -127,8 +127,8 @@ margin: 0;</string>
        </property>
        <property name="font">
         <font>
-         <family>Arial</family>
-         <pointsize>16</pointsize>
+         <family>Sans Serif</family>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="styleSheet">
@@ -159,8 +159,8 @@ border: 0;</string>
        </property>
        <property name="font">
         <font>
-         <family>Arial</family>
-         <pointsize>16</pointsize>
+         <family>Sans Serif</family>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="styleSheet">
@@ -177,7 +177,7 @@ border: 0;</string>
       <widget class="QLabel" name="textMsg">
        <property name="geometry">
         <rect>
-         <x>25</x>
+         <x>40</x>
          <y>100</y>
          <width>200</width>
          <height>40</height>
@@ -185,8 +185,8 @@ border: 0;</string>
        </property>
        <property name="font">
         <font>
-         <family>Arial</family>
-         <pointsize>16</pointsize>
+         <family>Sans Serif</family>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="styleSheet">
@@ -761,6 +761,7 @@ background: transparent;</string>
              <font>
               <family>Arial</family>
               <pointsize>18</pointsize>
+              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -901,6 +902,7 @@ background: transparent;
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1159,6 +1161,7 @@ color: black;</string>
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1213,6 +1216,7 @@ background: transparent;</string>
            <font>
             <family>Arial</family>
             <pointsize>16</pointsize>
+            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -1384,8 +1388,9 @@ background: transparent;</string>
           </property>
           <property name="font">
            <font>
-            <pointsize>16</pointsize>
-            <bold>true</bold>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="styleSheet">
