@@ -329,27 +329,13 @@ void MainWindow::setTextMsg(const QString& msg)
     // Check the length of the message and decrease the font if necessary.
     if (msg.length() > 10)
     {
-        auto strs = displayedMsg.split(" ", Qt::SkipEmptyParts);
-        displayedMsg.clear();
-        for (int i = 0; i < strs.length(); ++i)
-        {
-            if (displayedMsg.length() == 10)
-            {
-                displayedMsg += "/n";
-            }
-            else if (i != strs.length() - 1)
-            {
-                displayedMsg += " ";
-            }
-
-            displayedMsg += strs[i];
-        }
-
-       labelFont.setPointSize(8);
+       labelFont.setPointSize(10);
+       ui->textMsg->setWordWrap(true);
+       ui->audioLabel->setWordWrap(true);
     }
     else
     {
-        labelFont.setPointSize(11);
+        labelFont.setPointSize(12);
     }
 
     ui->textMsg->setFont(labelFont);
@@ -421,13 +407,13 @@ void MainWindow::updateGUI(int state)
     break;
 
     case SELF_TEST_FAIL:
-        setTextMsg("UNIT FAILED.");
+        setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
     break;
 
     case SELF_TEST_SUCCESS:
-        setTextMsg("UNIT OK.");
+        setTextMsg("UNIT OK");
         ui->selfCheckIndicator->setChecked(true);
         ui->powerBtn->setChecked(true);
 
@@ -485,7 +471,7 @@ void MainWindow::updateGUI(int state)
 
     case ANALYZING:
         turnOnIndicator(CONTACT_INDICATOR);
-        setTextMsg("ANALYZING.");
+        setTextMsg("ANALYZING");
     break;
 
     case LOST_CONNECTION:
