@@ -3,6 +3,8 @@
 #include <QRandomGenerator>
 
 
+
+
 AED::AED()
     : QObject(nullptr)
     , patientHeartCondition(SINUS_RHYTHM)
@@ -19,12 +21,14 @@ AED::AED()
 AED::~AED()
 {
     QMetaObject::invokeMethod(this, "cleanup");
-    m_thread -> wait();
+    m_thread->wait();
 }
+
 void AED::cleanUp(){
 
-    m_thread -> quit();
+    m_thread->quit();
 }
+
 void AED::powerOn()
 {
     // Abort if there is not GUI connected.
@@ -33,15 +37,31 @@ void AED::powerOn()
     run();
 }
 
+void AED::powerOff()
+{
+    if (state != OFF && state != ABORT && state != SHOCKING)
+    {
+        state = ABORT;
+    }
+}
+
 void AED::checkPadsAttached()
 {
     if (!padsAttached)
     {
+        if (state == ABORT) return;
         // Cycle through the stages if the pads have not been attached.
         nextStep(STAY_CALM, SLEEP, 0);
+
+        if (state == ABORT) return;
         nextStep(CHECK_RESPONSE, SLEEP, 0);
+
+
+        if (state == ABORT) return;
         nextStep(CALL_HELP, SLEEP, 0);
 
+
+        if (state == ABORT) return;
         // Ask the user to attach the pads.
         nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
 
@@ -75,6 +95,8 @@ void AED::checkConnection()
 
 void AED::run()
 {
+    if (state == ABORT) return;
+
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
 
@@ -107,8 +129,10 @@ void AED::run()
 
     for (int i = 0; i <= shockUntilHealthy; ++i)
     {
+        if (state == ABORT) return;
         nextStep(ANALYZING, ANALYZING_TIME, 0);
 
+        if (state == ABORT) return;
         // Change patient to healthy once all shocks have been delivered.
         if (shockable() && i == shockUntilHealthy)
         {
@@ -117,8 +141,8 @@ void AED::run()
            emit updatePatientCondition(SINUS_RHYTHM);
         }
 
+        if (state == ABORT) return;
         bool shockNeeded = shockable() && (i > 0 || !startWithAsystole);
-
         emit updateGUI(shockNeeded ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
         QThread::msleep(SLEEP);
 
@@ -129,6 +153,7 @@ void AED::run()
             return;
         }
 
+        if (state == ABORT) return;
         // Simulating connection lost.
         checkConnection();
 
@@ -138,6 +163,7 @@ void AED::run()
             int shockJoule = shockCount >= 3 ? 3 : shockCount;
             int batteryUnits = shockJoule * batteryUnitsPerShock;
 
+            if (state == ABORT) return;
             if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
             {
                 //Indicate the user to change battery
@@ -147,11 +173,13 @@ void AED::run()
                 return;
             }
 
+            if (state == ABORT) return;
             nextStep(STAND_CLEAR, SLEEP, 0);
             nextStep(SHOCKING, SHOCKING_TIME, 0);
             nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
         }
 
+        if (state == ABORT) return;
         nextStep(CPR, CPR_TIME, 0);
         nextStep(STOP_CPR, SLEEP, 0);
     }
@@ -211,6 +239,13 @@ AEDState AED::getState() const
 {
     return this->state;
 }
+
+
+void AED::setState(int state)
+{
+    this->state = (AEDState)state;
+}
+
 
 int AED::getBatteryLevel() const
 {

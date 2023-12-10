@@ -21,6 +21,7 @@ class AED : public QObject{
 public:
     explicit AED();
     ~AED();
+
     AED* getInstance();
 
     // Getters
@@ -32,8 +33,11 @@ public:
     // Setters
     void setGUI(MainWindow* mainWindow);
 
+    friend class MainWindow;
+
 public slots:
     void powerOn();
+    void powerOff();
 
     // Set configs prior to simulation.
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
@@ -45,6 +49,7 @@ public slots:
     void setLostConnection(bool simulateConnectionLoss);
     void setBatteryLevel(int level);
     void notifyReconnection();
+    void setState(int state);
 private slots:
     void cleanUp();
 signals:

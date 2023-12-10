@@ -81,6 +81,7 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
     connect(this, &MainWindow::setBatteryLevel, device, &AED::setBatteryLevel);
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
+    connect(this, &MainWindow::powerOff, device, &AED::powerOff);
     connect(this, &MainWindow::notifyReconnection, device, &AED::notifyReconnection);
     connect(this, &MainWindow::setLostConnection, device, &AED::setLostConnection);
 }
@@ -137,11 +138,6 @@ void MainWindow::turnOffAllIndicators()
 
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
-    // Reset timer and remove event listeners.
-    timeUpdateCounter->stop();
-    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
-    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
-
     // Initiate self-test after the start.
     if (checked)
     {
@@ -162,16 +158,40 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Set patient heart condition.
         setPatientCondition();
 
-
         // Set other conditions prior to running the device.
         emit setPadsAttached(ui->cprPadsAttached->isChecked());
         emit setLostConnection(ui->connectionLoss->isChecked());
 
         // Start the AED thread.
         emit powerOn();
+
+        ui->powerBtn->setChecked(true);
+
+        // Reset timer and remove event listeners.
+        disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+        timeUpdateCounter->start();
     }
     else
     {
+        if (device->getState() == OFF)
+        {
+            return;
+        }
+        else
+        {
+            // Stop the thread.
+            // Ensure that the AED thread is running.
+            emit device->powerOff();
+            QThread::msleep(100);
+        }
+
+        // Reset timer and remove event listeners.
+        timeUpdateCounter->stop();
+        disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+
+        turnOffAllIndicators();
+        setTextMsg("");
+
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
         ui->numOfRunsSelector->setEnabled(true);
@@ -182,7 +202,6 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         ui->padsIndicator->setChecked(false);
 
         ui->selfCheckIndicator->setChecked(false);
-        ui->powerBtn->setChecked(false);
 
         // Disable pads selector.
         ui->padsSelector->setEnabled(true);
@@ -190,10 +209,13 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Re-enable loss connection selector.
         ui->connectionLoss->setEnabled(true);
 
+        ui->powerBtn->setChecked(false);
+
+        emit setState(OFF);
+
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
         timeUpdateCounter->start(5000);
-
     }
 }
 

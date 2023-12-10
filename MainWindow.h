@@ -50,9 +50,11 @@ signals:
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void terminate();
     void powerOn();
+    void powerOff();
     void setLostConnection(bool simulateConnectionLoss);
     void setBatteryLevel(int level);
     void notifyReconnection();
+    void setState(int state);
 
 private slots:
     void on_powerBtn_toggled(bool checked);
