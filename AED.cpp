@@ -37,6 +37,14 @@ void AED::checkPadsAttached()
 {
     if (!padsAttached)
     {
+        // Cycle through the stages if the pads have not been attached.
+        nextStep(STAY_CALM, SLEEP, 0);
+        nextStep(CHECK_RESPONSE, SLEEP, 0);
+        nextStep(CALL_HELP, SLEEP, 0);
+
+        // Ask the user to attach the pads.
+        nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
+
         QMutexLocker locker(&padsAttachedMutex);
         waitForPadsAttachement.wait(&padsAttachedMutex);
         padsAttached = true;
@@ -88,13 +96,6 @@ void AED::run()
     {
         nextStep(SELF_TEST_SUCCESS, SLEEP, 0);
     }
-
-    nextStep(STAY_CALM, SLEEP, 0);
-    nextStep(CHECK_RESPONSE, SLEEP, 0);
-    nextStep(CALL_HELP, SLEEP, 0);
-
-    // Ask the user to attach the pads.
-    nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
 
     checkPadsAttached();
 
