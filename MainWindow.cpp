@@ -609,11 +609,8 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
             bool adultPads = ui->padsSelector->currentIndex() == 0;
             setTextMsg(QString("%1 PADS").arg(adultPads ? "ADULT" : "PEDIATRIC"));
 
-            // Keep the pads indicator message for some time.
-            QTimer::singleShot(1000, this, [this]() {
-                // Operator is attaching the pads to the patient.
-                device->notifyPadsAttached();
-            });
+            // Operator is attaching the pads to the patient.
+            device->notifyPadsAttached();
         }
         else
         {
