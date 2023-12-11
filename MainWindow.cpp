@@ -210,7 +210,7 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         ui->powerBtn->setChecked(false);
 
-        emit setState(OFF);
+        device->setState(OFF);
 
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
@@ -556,7 +556,7 @@ void MainWindow::updateGUI(int state)
     case ABORT:
         setTextMsg("");
 
-        //Turn off the device
+        // Turn off the device.
         ui->powerBtn->toggle();
         ui->selfCheckIndicator->setEnabled(false);
 
@@ -609,12 +609,12 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
             // Keep the pads indicator message for some time.
             QTimer::singleShot(1000, this, [this]() {
                 // Operator is attaching the pads to the patient.
-                this->device->notifyPadsAttached();
+                device->notifyPadsAttached();
             });
         }
         else
         {
-            this->device->notifyPadsAttached();
+            device->notifyPadsAttached();
         }
     }
 }
