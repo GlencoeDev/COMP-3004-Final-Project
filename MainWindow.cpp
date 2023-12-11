@@ -430,7 +430,10 @@ void MainWindow::updateGUI(int state)
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
-        ui->powerBtn->setChecked(false);
+        QTimer::singleShot(2000, this, [this](){
+            this->ui->powerBtn->setChecked(false);
+        });
+
     break;
 
     case SELF_TEST_SUCCESS:
@@ -606,11 +609,8 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
             bool adultPads = ui->padsSelector->currentIndex() == 0;
             setTextMsg(QString("%1 PADS").arg(adultPads ? "ADULT" : "PEDIATRIC"));
 
-            // Keep the pads indicator message for some time.
-            QTimer::singleShot(1000, this, [this]() {
-                // Operator is attaching the pads to the patient.
-                device->notifyPadsAttached();
-            });
+            // Operator is attaching the pads to the patient.
+            device->notifyPadsAttached();
         }
         else
         {

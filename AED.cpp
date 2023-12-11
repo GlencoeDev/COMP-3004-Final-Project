@@ -65,8 +65,19 @@ void AED::checkPadsAttached()
         // Ask the user to attach the pads.
         nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
 
+        if (padsAttached)
+        {
+            // Keep the pads indicator message for some time.
+            QThread::msleep(1000);
+            return;
+        }
+
         QMutexLocker locker(&padsAttachedMutex);
         waitForPadsAttachement.wait(&padsAttachedMutex);
+
+        // Keep the pads indicator message for some time.
+        QThread::msleep(1000);
+
         padsAttached = true;
     }
     else
