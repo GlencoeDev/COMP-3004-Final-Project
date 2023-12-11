@@ -1,42 +1,80 @@
+/*
+    Class: AED
+    Purpose: This is the main class that simulates the AED device.
+*/
+
+// IMPORTS
 #include "AED.h"
-#include "MainWindow.h"
-#include <QRandomGenerator>
 
-
-
-
+/*
+    Function: AED()
+    Purpose: Constructor for AED class. Initializes the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 AED::AED()
-    : QObject(nullptr)
-    , patientHeartCondition(SINUS_RHYTHM)
-    , padsAttached(false)
-    , batteryLevel(100)
-    , shockCount(0)
-    , loseConnection(false)
+    : QObject(nullptr), patientHeartCondition(SINUS_RHYTHM), padsAttached(false), batteryLevel(100), shockCount(0), loseConnection(false)
 {
     m_thread.reset(new QThread);
     moveToThread(m_thread.get());
     m_thread->start();
 }
 
+/*
+    Function: ~AED()
+    Purpose: Destructor for AED class. Cleans up the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 AED::~AED()
 {
     QMetaObject::invokeMethod(this, "cleanup");
     m_thread->wait();
 }
 
-void AED::cleanUp(){
+/*
+    Function: cleanUp()
+    Purpose: Cleans up the AED device.
+    Inputs:
+        None
+    Outputs:
+       None
+*/
+void AED::cleanUp()
+{
 
     m_thread->quit();
 }
 
+/*
+    Function: powerOn()
+    Purpose: Powers on the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::powerOn()
 {
     // Abort if there is not GUI connected.
-    if (gui == nullptr) return;
+    if (gui == nullptr)
+        return;
 
     run();
 }
 
+/*
+    Function: powerOff()
+    Purpose: Powers off the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::powerOff()
 {
     if (state != OFF && state != ABORT && state != SHOCKING)
@@ -45,23 +83,33 @@ void AED::powerOff()
     }
 }
 
+/*
+    Function: checkPadsAttached()
+    Purpose: Checks if the pads are attached to the patient.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::checkPadsAttached()
 {
     if (!padsAttached)
     {
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         // Cycle through the stages if the pads have not been attached.
         nextStep(STAY_CALM, SLEEP, 0);
 
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         nextStep(CHECK_RESPONSE, SLEEP, 0);
 
-
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         nextStep(CALL_HELP, SLEEP, 0);
 
-
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         // Ask the user to attach the pads.
         nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
 
@@ -75,12 +123,28 @@ void AED::checkPadsAttached()
     }
 }
 
+/*
+    Function: setLostConnection()
+    Purpose: Sets the connection status of the AED device.
+    Inputs:
+        bool simulateConnectionLoss: True if the connection is lost, false otherwise.
+    Outputs:
+        None
+
+*/
 void AED::setLostConnection(bool simulateConnectionLoss)
 {
     this->loseConnection = simulateConnectionLoss;
 }
 
-
+/*
+    Function: checkConnection()
+    Purpose: Checks if the connection is lost.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::checkConnection()
 {
     // Simulate connection loss if such testing requirement was selected with ~33% probability.
@@ -93,9 +157,18 @@ void AED::checkConnection()
     }
 }
 
+/*
+    Function: run()
+    Purpose: Runs the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::run()
 {
-    if (state == ABORT) return;
+    if (state == ABORT)
+        return;
 
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
@@ -129,19 +202,22 @@ void AED::run()
 
     for (int i = 0; i <= shockUntilHealthy; ++i)
     {
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         nextStep(ANALYZING, ANALYZING_TIME, 0);
 
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         // Change patient to healthy once all shocks have been delivered.
         if (shockable() && i == shockUntilHealthy)
         {
-           // Update patient heart condition to healthy since all shocks have been delivered.
-           patientHeartCondition = SINUS_RHYTHM;
-           emit updatePatientCondition(SINUS_RHYTHM);
+            // Update patient heart condition to healthy since all shocks have been delivered.
+            patientHeartCondition = SINUS_RHYTHM;
+            emit updatePatientCondition(SINUS_RHYTHM);
         }
 
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         bool shockNeeded = shockable() && (i > 0 || !startWithAsystole);
         emit updateGUI(shockNeeded ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
         QThread::msleep(SLEEP);
@@ -153,7 +229,8 @@ void AED::run()
             return;
         }
 
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         // Simulating connection lost.
         checkConnection();
 
@@ -163,29 +240,40 @@ void AED::run()
             int shockJoule = shockCount >= 3 ? 3 : shockCount;
             int batteryUnits = shockJoule * batteryUnitsPerShock;
 
-            if (state == ABORT) return;
+            if (state == ABORT)
+                return;
             if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
             {
-                //Indicate the user to change battery
+                // Indicate the user to change battery
                 nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
-                //Then abort
+                // Then abort
                 nextStep(ABORT, 0, 0);
                 return;
             }
 
-            if (state == ABORT) return;
+            if (state == ABORT)
+                return;
             nextStep(STAND_CLEAR, SLEEP, 0);
             nextStep(SHOCKING, SHOCKING_TIME, 0);
             nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
         }
 
-        if (state == ABORT) return;
+        if (state == ABORT)
+            return;
         nextStep(CPR, CPR_TIME, 0);
         nextStep(STOP_CPR, SLEEP, 0);
     }
 }
 
-void AED::setGUI(MainWindow* mainWindow)
+/*
+    Function: setGUI()
+    Purpose: Sets the GUI for the AED device.
+    Inputs:
+        MainWindow *mainWindow: Pointer to the GUI.
+    Outputs:
+        None
+*/
+void AED::setGUI(MainWindow *mainWindow)
 {
     this->gui = mainWindow;
 
@@ -195,7 +283,16 @@ void AED::setGUI(MainWindow* mainWindow)
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
 }
 
-// Going to the next step.
+/*
+    Function: nextStep()
+    Purpose: Updates the AED device to the next step.
+    Inputs:
+        AEDState state: The next state of the AED device.
+        unsigned long sleepTime: The time to sleep before the next step.
+        int batteryUsed: The amount of battery used for the next step.
+    Outputs:
+        None
+*/
 void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
     this->state = state;
@@ -218,6 +315,15 @@ void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
         QThread::msleep(sleepTime);
     }
 }
+
+/*
+    Function: shockable()
+    Purpose: Checks if the patient is on shockable rhythm.
+    Inputs:
+        None
+    Outputs:
+        True if the patient is on shockable rhythm, false otherwise.
+*/
 bool AED::shockable() const
 {
     // if patiernt is on shockable rhythm
@@ -230,38 +336,92 @@ bool AED::shockable() const
     return false;
 }
 
+/*
+    Function: getPatientHeartCondition()
+    Purpose: Gets the patient's heart condition.
+    Inputs:
+        None
+    Outputs:
+        The patient's heart condition.
+*/
 HeartState AED::getPatientHeartCondition() const
 {
     return this->patientHeartCondition;
 }
 
+/*
+    Function: getState()
+    Purpose: Gets the state of the AED device.
+    Inputs:
+        None
+    Outputs:
+        The state of the AED device.
+*/
 AEDState AED::getState() const
 {
     return this->state;
 }
 
-
+/*
+    Function: setState()
+    Purpose: Sets the state of the AED device.
+    Inputs:
+        int state: The state of the AED device.
+    Outputs:
+        None
+*/
 void AED::setState(int state)
 {
     this->state = (AEDState)state;
 }
 
-
+/*
+    Function: getBatteryLevel()
+    Purpose: Gets the battery level of the AED device.
+    Inputs:
+        None
+    Outputs:
+        The battery level of the AED device.
+*/
 int AED::getBatteryLevel() const
 {
     return this->batteryLevel;
 }
 
+/*
+    Function: setPatientHeartCondition()
+    Purpose: Sets the patient's heart condition.
+    Inputs:
+        int patientHeartCondition: The patient's heart condition. This represents the index of the heart condition in the HeartState enum.
+    Outputs:
+        None
+*/
 void AED::setPatientHeartCondition(int patientHeartCondition)
 {
-    this->patientHeartCondition = (HeartState) patientHeartCondition;
+    this->patientHeartCondition = (HeartState)patientHeartCondition;
 }
 
+/*
+    Function: setPadsAttached()
+    Purpose: Sets the status of the pads.
+    Inputs:
+        bool padsAttached: True if the pads are attached, false otherwise.
+    Outputs:
+        None
+*/
 void AED::setPadsAttached(bool padsAttached)
 {
     this->padsAttached = padsAttached;
 }
 
+/*
+    Function: notifyPadsAttached()
+    Purpose: Notifies the AED device that the pads are attached.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::notifyPadsAttached()
 {
     padsAttached = true;
@@ -269,17 +429,44 @@ void AED::notifyPadsAttached()
     waitForPadsAttachement.wakeOne();
 }
 
+/*
+    Function: notifyReconnection()
+    Purpose: Notifies the AED device that the connection is restored.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
 void AED::notifyReconnection()
 {
     QMutexLocker locker(&restoreConnectionMutex);
     waitForConnection.wakeOne();
-
 }
-void AED::setBatteryLevel(int level){
+
+/*
+    Function: setBatteryLevel()
+    Purpose: Sets the battery level of the AED device.
+    Inputs:
+        int level: The battery level of the AED device.
+    Outputs:
+        None
+*/
+void AED::setBatteryLevel(int level)
+{
     batteryLevel = level;
     emit batteryChanged(level);
 }
 
+/*
+    Function: setBatterySpecs()
+    Purpose: Sets the battery specs of the AED device.
+    Inputs:
+        int startingLevel: The starting battery level of the AED device.
+        int unitsPerShock: The amount of battery used per shock.
+        int unitsWhenIdle: The amount of battery used when the AED device is idle.
+    Outputs:
+        None
+*/
 void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle)
 {
     batteryLevel = startingLevel;
@@ -287,10 +474,27 @@ void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdl
     batteryUnitsWhenIdle = unitsWhenIdle;
 }
 
-void AED::setShockUntilHealthy(int shockUntilHealthy){
+/*
+    Function: setShockUntilHealthy()
+    Purpose: Sets the number of shocks to deliver until the patient is healthy.
+    Inputs:
+        int shockUntilHealthy: The number of shocks to deliver until the patient is healthy.
+    Outputs:
+        None
+*/
+void AED::setShockUntilHealthy(int shockUntilHealthy)
+{
     this->shockUntilHealthy = shockUntilHealthy;
 }
 
+/*
+    Function: setStartWithAsystole()
+    Purpose: Sets whether the patient should start with asystole.
+    Inputs:
+        bool checked: True if the patient should start with asystole, false otherwise.
+    Outputs:
+        None
+*/
 void AED::setStartWithAsystole(bool checked)
 {
     this->startWithAsystole = checked;

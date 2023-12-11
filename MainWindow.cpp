@@ -1,13 +1,14 @@
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
-#include <QThread>
-#include <QTimer>
-#include "AED.h"
-
+/*
+    Function: MainWindow(QWidget *parent)
+    Purpose: Constructor.
+    Input:
+        parent - The parent widget.
+    Output:
+        None
+*/
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , currentStep(-1)
+    : QMainWindow(parent), ui(new Ui::MainWindow), currentStep(-1)
 {
     ui->setupUi(this);
 
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
                    << ui->shockIndicator;
 
     QPixmap pixmap(":/Icons/indicator_off.png");
-    foreach(auto indicator, stepIndicators)
+    foreach (auto indicator, stepIndicators)
     {
         indicator->setEnabled(false);
     }
@@ -52,23 +53,40 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set up timer for flashing step indicator.
     indicatorTimer = new QTimer(this);
-    connect(indicatorTimer, &QTimer::timeout, this, [this]() {
+    connect(indicatorTimer, &QTimer::timeout, this, [this]()
+            {
         if (this->currentStep > -1)
         {
             stepIndicators[this->currentStep]->toggle();
-        }
-    });
+        } });
     indicatorTimer->start(500);
 }
 
+/*
+    Function: ~MainWindow()
+    Purpose: Destructor.
+    Input:
+        None
+    Output:
+        None
+*/
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::addAED(AED* device)
+/*
+    Function: addAED(AED *device)
+    Purpose: Add an AED device to the GUI.
+    Input:
+        device - A pointer to the AED device.
+    Output:
+        None
+*/
+void MainWindow::addAED(AED *device)
 {
-    if (device == nullptr) return;
+    if (device == nullptr)
+        return;
 
     this->device = device;
 
@@ -86,9 +104,19 @@ void MainWindow::addAED(AED* device)
     connect(this, &MainWindow::setLostConnection, device, &AED::setLostConnection);
 }
 
+/*
+    Function: turnOnIndicator(int index)
+    Purpose: Turn on the indicator at the specified index. Here the index
+             is the index of the indicator in the stepIndicators list.
+    Input:
+        index - The index of the indicator to turn on.
+    Output:
+        None
+*/
 void MainWindow::turnOnIndicator(int index)
 {
-    if (index < 0 || index > stepIndicators.length() - 1) return;
+    if (index < 0 || index > stepIndicators.length() - 1)
+        return;
 
     currentStep = index;
 
@@ -113,9 +141,19 @@ void MainWindow::turnOnIndicator(int index)
     QCoreApplication::processEvents();
 }
 
+/*
+    Function: turnOffIndicator(int index)
+    Purpose: Turn off the indicator at the specified index. Here the index
+             is the index of the indicator in the stepIndicators list.
+    Input:
+        index - The index of the indicator to turn off.
+    Output:
+        None
+*/
 void MainWindow::turnOffIndicator(int index)
 {
-    if (index < 0 || index > stepIndicators.length() - 1) return;
+    if (index < 0 || index > stepIndicators.length() - 1)
+        return;
 
     currentStep = -1;
 
@@ -124,11 +162,19 @@ void MainWindow::turnOffIndicator(int index)
     QCoreApplication::processEvents();
 }
 
+/*
+    Function: turnOffAllIndicators()
+    Purpose: Turn off all indicators.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::turnOffAllIndicators()
 {
     currentStep = -1;
 
-    foreach(auto indicator, stepIndicators)
+    foreach (auto indicator, stepIndicators)
     {
         indicator->setChecked(false);
     }
@@ -136,6 +182,14 @@ void MainWindow::turnOffAllIndicators()
     QCoreApplication::processEvents();
 }
 
+/*
+    Function: MainWindow::on_powerBtn_toggled(bool checked)
+    Purpose: Turn on/off the AED device.
+    Input:
+        checked - Whether the button is checked.
+    Output:
+        None
+*/
 void MainWindow::on_powerBtn_toggled(bool checked)
 {
     // Initiate self-test after the start.
@@ -219,10 +273,19 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     }
 }
 
+/*
+    Function: setCPRDepth(float depth)
+    Purpose: Set the CPR depth.
+    Input:
+        depth - The depth of the CPR.
+    Output:
+        None
+*/
 void MainWindow::setCPRDepth(float depth)
 {
     // Ensure valid range.
-    if (depth < 0) return;
+    if (depth < 0)
+        return;
 
     // No CPR is taking place.
     if (depth == 0)
@@ -260,6 +323,14 @@ void MainWindow::setCPRDepth(float depth)
     QApplication::processEvents();
 }
 
+/*
+    Function: toggleBatteryUnitControls(bool enable)
+    Purpose: Enable/disable battery unit controls.
+    Input:
+        enable - Whether to enable/disable the controls.
+    Output:
+        None
+*/
 void MainWindow::toggleBatteryUnitControls(bool enable)
 {
     ui->batteryPerShock->setEnabled(enable);
@@ -267,6 +338,14 @@ void MainWindow::toggleBatteryUnitControls(bool enable)
     ui->startingBatteryLevel->setEnabled(enable);
 }
 
+/*
+    Function: updateElapsedTime()
+    Purpose: Update the elapsed time.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::updateElapsedTime()
 {
     elapsedTimeSec++;
@@ -287,7 +366,7 @@ void MainWindow::updateElapsedTime()
     QString timerStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui->elapsedTime->setText(timerStr);
 
-    //Decrease battery
+    // Decrease battery
     int currentBatteryLevel = ui->startingBatteryLevel->value();
     int batteryWhenIdle = ui->batteryWhenIdle->value();
     currentBatteryLevel -= batteryWhenIdle;
@@ -297,6 +376,14 @@ void MainWindow::updateElapsedTime()
     QApplication::processEvents();
 }
 
+/*
+    Function: resetElapsedTime()
+    Purpose: Reset the elapsed time.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::resetElapsedTime()
 {
     elapsedTimeSec = 0;
@@ -306,6 +393,14 @@ void MainWindow::resetElapsedTime()
     QApplication::processEvents();
 }
 
+/*
+    Function: on_conditionSelector_currentIndexChanged(int index)
+    Purpose: Update the number of runs selector depending on the patient condition.
+    Input:
+        index - The index of the patient condition.
+    Output:
+        None
+*/
 void MainWindow::on_conditionSelector_currentIndexChanged(int index)
 {
     // Disable selector for the number of runs since
@@ -323,19 +418,42 @@ void MainWindow::on_conditionSelector_currentIndexChanged(int index)
     }
 }
 
+/*
+    Function: on_shallowPushButton_clicked()
+    Purpose: Set the CPR depth to shallow push.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::on_deepPushButton_clicked()
 {
     setCPRDepth(DEEP_PUSH);
     setTextMsg(QString("GOOD COMPRESSIONS"));
 }
 
-
+/*
+    Function: on_shallowPushButton_clicked()
+    Purpose: Set the CPR depth to deep push.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::on_shallowPushButton_clicked()
 {
     setCPRDepth(SHALLOW_PUSH);
     setTextMsg(QString("PUSH HARDER"));
 }
 
+/*
+    Function: updateBatteryLevel(int currentLevel)
+    Purpose: Update the battery level.
+    Input:
+        currentLevel - The current battery level.
+    Output:
+        None
+*/
 void MainWindow::updateBatteryLevel(int currentLevel)
 {
     ui->batteryIndicator->setValue(currentLevel);
@@ -343,7 +461,15 @@ void MainWindow::updateBatteryLevel(int currentLevel)
     ui->startingBatteryLevel->setValue(currentLevel);
 }
 
-void MainWindow::setTextMsg(const QString& msg)
+/*
+    Function: setTextMsg(const QString &msg)
+    Purpose: Set the text message.
+    Input:
+        msg - The message to display.
+    Output:
+        None
+*/
+void MainWindow::setTextMsg(const QString &msg)
 {
     QString displayedMsg = msg;
     QFont labelFont = QApplication::font();
@@ -351,9 +477,9 @@ void MainWindow::setTextMsg(const QString& msg)
     // Check the length of the message and decrease the font if necessary.
     if (msg.length() > 10)
     {
-       labelFont.setPointSize(10);
-       ui->textMsg->setWordWrap(true);
-       ui->audioLabel->setWordWrap(true);
+        labelFont.setPointSize(10);
+        ui->textMsg->setWordWrap(true);
+        ui->audioLabel->setWordWrap(true);
     }
     else
     {
@@ -367,10 +493,18 @@ void MainWindow::setTextMsg(const QString& msg)
     ui->audioLabel->setText(msg);
 }
 
+/*
+    Function: setDeviceBatterySpecs()
+    Purpose: Set the battery specs for the AED device.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::setDeviceBatterySpecs()
 {
     int startingValue = ui->startingBatteryLevel->value();
-    int batteryPerShock = ui->batteryPerShock-> value();
+    int batteryPerShock = ui->batteryPerShock->value();
     int batteryWhenIdle = ui->batteryWhenIdle->value();
 
     // Update battery indicator.
@@ -380,6 +514,14 @@ void MainWindow::setDeviceBatterySpecs()
     emit setBatterySpecs(startingValue, batteryPerShock, batteryWhenIdle);
 }
 
+/*
+    Function: setPatientCondition()
+    Purpose: Set the patient condition.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::setPatientCondition()
 {
     int patientHeartCondition = ui->conditionSelector->currentIndex();
@@ -391,34 +533,58 @@ void MainWindow::setPatientCondition()
     emit setStartWithAsystole(ui->startWithAsystole->isChecked());
 }
 
-void MainWindow::updateECGDisplay(const QString& image)
+/*
+    Function: updateECGDisplay(const QString &image)
+    Purpose: Update the ECG display.
+    Input:
+        image - The image to display.
+    Output:
+        None
+*/
+void MainWindow::updateECGDisplay(const QString &image)
 {
     QPixmap pixmap;
     pixmap.load(image);
     ui->ecgDisplay->setPixmap(pixmap);
 }
 
+/*
+    Function: updateECGDisplay(HeartState state)
+    Purpose: Update the ECG display depending on the heart condition of the patient.
+    Input:
+        state - The heart condition of the patient.
+    Output:
+        None
+*/
 void MainWindow::updateECGDisplay(HeartState state)
 {
     switch (state)
     {
     case SINUS_RHYTHM:
         updateECGDisplay(QString("://Icons/ECG_SINUS.png"));
-    break;
+        break;
 
     case VENTRICULAR_FIBRILLATION:
         updateECGDisplay(QString("://Icons/ventricullar_fibrillation.png"));
-    break;
+        break;
 
     case VENTRICULAR_TACHYCARDIA:
         updateECGDisplay(QString("://Icons/ventricular_tachycardia.png"));
-    break;
+        break;
     }
 }
 
+/*
+    Function: updateGUI(int state)
+    Purpose: Update the GUI depending on the state of the AED device.
+    Input:
+        state - The state of the AED device.
+    Output:
+        None
+*/
 void MainWindow::updateGUI(int state)
 {
-    AEDState theState = (AEDState) state;
+    AEDState theState = (AEDState)state;
     switch (theState)
     {
     case OFF:
@@ -426,13 +592,13 @@ void MainWindow::updateGUI(int state)
         ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
         currentStep = -1;
-    break;
+        break;
 
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
         ui->powerBtn->setChecked(false);
-    break;
+        break;
 
     case SELF_TEST_SUCCESS:
         setTextMsg("UNIT OK");
@@ -443,7 +609,7 @@ void MainWindow::updateGUI(int state)
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
         timeUpdateCounter->start(1000);
 
-    break;
+        break;
 
     case CHANGE_BATTERIES:
         setTextMsg("CHANGE BATTERIES");
@@ -455,21 +621,21 @@ void MainWindow::updateGUI(int state)
 
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
-    break;
+        break;
 
     case STAY_CALM:
         setTextMsg("STAY CALM");
-    break;
+        break;
 
     case CHECK_RESPONSE:
         setTextMsg("CHECK RESPONSIVENESS");
         turnOnIndicator(RESPONSE_INDICATOR);
-    break;
+        break;
 
     case CALL_HELP:
         setTextMsg("CALL HELP");
         turnOnIndicator(HELP_INDICATOR);
-    break;
+        break;
 
     case ATTACH_PADS:
         turnOnIndicator(PADS_INDICATOR);
@@ -489,17 +655,17 @@ void MainWindow::updateGUI(int state)
             setTextMsg("");
             ui->cprPadsAttached->setEnabled(false);
         }
-    break;
+        break;
 
     case ANALYZING:
         turnOnIndicator(CONTACT_INDICATOR);
         setTextMsg("ANALYZING");
-    break;
+        break;
 
     case LOST_CONNECTION:
         setTextMsg("PLUG IN CABLE");
         ui->reconnectBtn->setEnabled(true);
-    break;
+        break;
 
     case NO_SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
@@ -514,7 +680,7 @@ void MainWindow::updateGUI(int state)
         {
             updateECGDisplay("://Icons/ECG_SINUS.png");
         }
-    break;
+        break;
 
     case SHOCK_ADVISED:
         turnOnIndicator(CONTACT_INDICATOR);
@@ -522,42 +688,42 @@ void MainWindow::updateGUI(int state)
 
         // TODO: Update ECG waveform.
         updateECGDisplay(device->getPatientHeartCondition());
-    break;
+        break;
 
     case STAND_CLEAR:
         turnOnIndicator(SHOCK_INDICATOR);
         setTextMsg("STAND CLEAR");
-    break;
+        break;
 
     case SHOCKING:
         turnOnIndicator(SHOCK_INDICATOR);
         setTextMsg("SHOCK WILL BE DELIVERED IN ONE, TWO, THREE...");
-    break;
+        break;
 
     case SHOCK_DELIVERED:
         turnOnIndicator(SHOCK_INDICATOR);
         setTextMsg("SHOCK DELIVERED");
-    break;
+        break;
 
     case CPR:
         turnOnIndicator(CPR_INDICATOR);
         setTextMsg("START CPR");
         ui->shallowPushButton->setEnabled(true);
         ui->deepPushButton->setEnabled(true);
-    break;
+        break;
 
     case STOP_CPR:
         setTextMsg("STOP CPR");
-        //Disable CPR button
+        // Disable CPR button
         ui->shallowPushButton->setEnabled(false);
         ui->deepPushButton->setEnabled(false);
         setCPRDepth(0.0);
-    break;
+        break;
 
     case ABORT:
         setTextMsg("");
 
-        //Turn off the device
+        // Turn off the device
         ui->powerBtn->toggle();
         ui->selfCheckIndicator->setEnabled(false);
 
@@ -566,28 +732,51 @@ void MainWindow::updateGUI(int state)
 
         // Remove ECG waveforms.
         ui->ecgDisplay->clear();
-    break;
+        break;
 
     default:
         setTextMsg("");
-    break;
+        break;
     }
 
     QApplication::processEvents();
 }
 
+/*
+    Function: updatePatientCondition(int condition)
+    Purpose: Update the patient condition.
+    Input:
+        condition - The condition of the patient.
+    Output:
+        None
+*/
 void MainWindow::updatePatientCondition(int condition)
 {
     ui->conditionSelector->setCurrentIndex(condition);
 }
 
+/*
+    Function: updateNumberOfShocks(int shocks)
+    Purpose: Update the number of shocks.
+    Input:
+        shocks - The number of shocks.
+    Output:
+
+*/
 void MainWindow::updateNumberOfShocks(int shocks)
 {
     // Set number of shocks
     ui->shockCount->setText(QString("SHOCKS: %1").arg(shocks, 2, 10, QChar('0')));
-
 }
 
+/*
+    Function: on_cprPadsAttached_clicked(bool checked)
+    Purpose: Attach the pads to the patient.
+    Input:
+        checked - Whether the pads are attached.
+    Output:
+        None
+*/
 void MainWindow::on_cprPadsAttached_clicked(bool checked)
 {
     ui->cprPadsAttached->setChecked(checked);
@@ -608,10 +797,10 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
             setTextMsg(QString("%1 PADS").arg(adultPads ? "ADULT" : "PEDIATRIC"));
 
             // Keep the pads indicator message for some time.
-            QTimer::singleShot(1000, this, [this]() {
+            QTimer::singleShot(1000, this, [this]()
+                               {
                 // Operator is attaching the pads to the patient.
-                this->device->notifyPadsAttached();
-            });
+                this->device->notifyPadsAttached(); });
         }
         else
         {
@@ -620,7 +809,14 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
     }
 }
 
-
+/*
+    Function: on_changeBatteries_clicked()
+    Purpose: Change the batteries.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::on_changeBatteries_clicked()
 {
     // Reset the battery to max battery level.
@@ -628,7 +824,14 @@ void MainWindow::on_changeBatteries_clicked()
     emit setBatteryLevel(MAX_BATTERY_LEVEL);
 }
 
-
+/*
+    Function: on_reconnectBtn_clicked()
+    Purpose: Reconnect the device.
+    Input:
+        None
+    Output:
+        None
+*/
 void MainWindow::on_reconnectBtn_clicked()
 {
     // Reset connection setting.

@@ -7,22 +7,25 @@
 #include <QWaitCondition>
 #include <QMutexLocker>
 #include <QMutex>
+#include <QThread>
+#include <QRandomGenerator>
 
 #ifndef AED_H
 #define AED_H
 
 #include "defs.h"
-#include <QThread>
+#include "MainWindow.h"
 
 class MainWindow;
 
-class AED : public QObject{
+class AED : public QObject
+{
     Q_OBJECT
 public:
     explicit AED();
     ~AED();
 
-    AED* getInstance();
+    AED *getInstance();
 
     // Getters
     HeartState getPatientHeartCondition() const;
@@ -31,7 +34,7 @@ public:
     int getBatteryLevel() const;
 
     // Setters
-    void setGUI(MainWindow* mainWindow);
+    void setGUI(MainWindow *mainWindow);
 
     friend class MainWindow;
 
@@ -87,7 +90,7 @@ private:
     QMutex restoreConnectionMutex;
     QWaitCondition waitForConnection;
 
-    MainWindow* gui;
+    MainWindow *gui;
     std::unique_ptr<QThread> m_thread;
 };
 
