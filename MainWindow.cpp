@@ -373,7 +373,7 @@ void MainWindow::updateElapsedTime()
     device->setBatteryLevel(currentBatteryLevel);
     updateBatteryLevel(currentBatteryLevel);
 
-    QApplication::processEvents();
+    // QApplication::processEvents();
 }
 
 /*
