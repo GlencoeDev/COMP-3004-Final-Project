@@ -430,7 +430,10 @@ void MainWindow::updateGUI(int state)
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
-        ui->powerBtn->setChecked(false);
+        QTimer::singleShot(2000, this, [this](){
+            this->ui->powerBtn->setChecked(false);
+        });
+
     break;
 
     case SELF_TEST_SUCCESS:
