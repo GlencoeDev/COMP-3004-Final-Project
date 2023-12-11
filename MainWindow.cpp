@@ -624,7 +624,7 @@ void MainWindow::on_changeBatteries_clicked()
 {
     // Reset the battery to max battery level.
     ui->startingBatteryLevel->setValue(MAX_BATTERY_LEVEL);
-    emit setBatteryLevel(MAX_BATTERY_LEVEL);
+    device->setBatteryLevel(MAX_BATTERY_LEVEL);
 }
 
 
