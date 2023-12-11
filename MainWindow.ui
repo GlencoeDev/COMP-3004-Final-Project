@@ -1333,7 +1333,7 @@ border: 2px solid #8a8f9e;</string>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>50</height>
+         <height>65</height>
         </size>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
