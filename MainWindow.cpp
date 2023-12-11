@@ -79,7 +79,6 @@ void MainWindow::addAED(AED* device)
     connect(this, SIGNAL(setPadsAttached(bool)), device, SLOT(setPadsAttached(bool)));
     connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
-    connect(this, &MainWindow::setBatteryLevel, device, &AED::setBatteryLevel);
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
     connect(this, &MainWindow::powerOff, device, &AED::powerOff);
     connect(this, &MainWindow::notifyReconnection, device, &AED::notifyReconnection);
@@ -287,11 +286,11 @@ void MainWindow::updateElapsedTime()
     QString timerStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui->elapsedTime->setText(timerStr);
 
-    //Decrease battery
+    // Decrease battery.
     int currentBatteryLevel = ui->startingBatteryLevel->value();
     int batteryWhenIdle = ui->batteryWhenIdle->value();
     currentBatteryLevel -= batteryWhenIdle;
-    emit setBatteryLevel(currentBatteryLevel);
+    device->setBatteryLevel(currentBatteryLevel);
     updateBatteryLevel(currentBatteryLevel);
 
     QApplication::processEvents();
@@ -531,7 +530,7 @@ void MainWindow::updateGUI(int state)
 
     case SHOCKING:
         turnOnIndicator(SHOCK_INDICATOR);
-        setTextMsg("SHOCK WILL BE DELIVERED IN ONE, TWO, THREE...");
+        setTextMsg("SHOCK WILL BE DELIVERED IN THREE, TWO, ONE...");
     break;
 
     case SHOCK_DELIVERED:

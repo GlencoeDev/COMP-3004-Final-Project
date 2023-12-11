@@ -119,6 +119,8 @@ void AED::run()
         nextStep(SELF_TEST_SUCCESS, SLEEP, 0);
     }
 
+    // Start reducing the battery.
+
     checkPadsAttached();
 
     // One extra round of CPR before delivering all shocks.
@@ -159,12 +161,10 @@ void AED::run()
 
         if (shockNeeded)
         {
-            // Check if we have enough battery.
-            int shockJoule = shockCount >= 3 ? 3 : shockCount;
-            int batteryUnits = shockJoule * batteryUnitsPerShock;
-
             if (state == ABORT) return;
-            if (batteryLevel - batteryUnits < SUFFICIENT_BATTERY_LEVEL)
+
+            // Check if we have enough battery.
+            if (batteryLevel - batteryUnitsPerShock < SUFFICIENT_BATTERY_LEVEL)
             {
                 //Indicate the user to change battery
                 nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
@@ -176,7 +176,7 @@ void AED::run()
             if (state == ABORT) return;
             nextStep(STAND_CLEAR, SLEEP, 0);
             nextStep(SHOCKING, SHOCKING_TIME, 0);
-            nextStep(SHOCK_DELIVERED, SLEEP, batteryUnits);
+            nextStep(SHOCK_DELIVERED, SLEEP, batteryUnitsPerShock);
         }
 
         if (state == ABORT) return;
@@ -275,9 +275,10 @@ void AED::notifyReconnection()
     waitForConnection.wakeOne();
 
 }
-void AED::setBatteryLevel(int level){
+
+void AED::setBatteryLevel(int level)
+{
     batteryLevel = level;
-    emit batteryChanged(level);
 }
 
 void AED::setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle)

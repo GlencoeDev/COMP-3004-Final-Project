@@ -33,8 +33,6 @@ public:
     // Setters
     void setGUI(MainWindow* mainWindow);
 
-    friend class MainWindow;
-
 public slots:
     void powerOn();
     void powerOff();
