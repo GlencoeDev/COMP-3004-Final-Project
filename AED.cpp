@@ -59,8 +59,6 @@ void AED::powerOn()
         return;
 
     run();
-
-    state = OFF;
 }
 
 /*
@@ -268,6 +266,7 @@ bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
     if (this->state == ABORT)
     {
+        emit updateGUI(ABORT);
         return false;
     };
 
