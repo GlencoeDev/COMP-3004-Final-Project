@@ -1,16 +1,25 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+// Qt imports
 #include <QMainWindow>
 #include <QPushButton>>
 #include <QTimer>
 #include <QList>
+#include <QThread>
+#include <QTimer>
+
+// Local imports
+#include "AED.h"
 #include "defs.h"
+#include "ui_MainWindow.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui
+{
+    class MainWindow;
+}
 QT_END_NAMESPACE
-
 
 class AED;
 
@@ -22,7 +31,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void addAED(AED* device);
+    void addAED(AED *device);
 
 public slots:
     void turnOnIndicator(int index);
@@ -31,7 +40,7 @@ public slots:
 
     // Functions for updating CPR depth compression indicator.
     void setCPRDepth(float depth);
-    void setTextMsg(const QString& msg);
+    void setTextMsg(const QString &msg);
 
     // Updating battery indicator.
     void updateBatteryLevel(int currentLevel);
@@ -77,23 +86,23 @@ private:
     void setDeviceBatterySpecs();
     void setPatientCondition();
 
-    //ECG Display updating
+    // ECG Display updating
     void updateECGDisplay(HeartState state);
-    void updateECGDisplay(const QString& image);
+    void updateECGDisplay(const QString &image);
 
     // Keep a list of the indicators shoing current AED operation step.
-    QList<QPushButton*> stepIndicators;
+    QList<QPushButton *> stepIndicators;
 
     int currentStep;
 
     // Used to update the elapsed time.
-    QTimer* timeUpdateCounter;
-    QTimer* indicatorTimer;
+    QTimer *timeUpdateCounter;
+    QTimer *indicatorTimer;
 
     // Saves elapsed time.
     int elapsedTimeSec;
 
-    AED* device;
-    QThread* deviceThread;
+    AED *device;
+    QThread *deviceThread;
 };
 #endif

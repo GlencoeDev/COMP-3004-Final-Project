@@ -27,32 +27,32 @@
 // Device state.
 enum AEDState
 {
-    OFF,
-    SELF_TEST_SUCCESS,
-    SELF_TEST_FAIL,
-    CHANGE_BATTERIES,
-    STAY_CALM,
-    CHECK_RESPONSE,
-    CALL_HELP,
-    ATTACH_PADS,
-    ANALYZING,          // Don't touch patient. Analyzing.
-    SHOCK_ADVISED,
-    NO_SHOCK_ADVISED,
-    STAND_CLEAR,
-    SHOCKING,           // Shock will be delivered in three, two, one...
-    SHOCK_DELIVERED,
-    CPR,
-    STOP_CPR,
-    ABORT,               // Turn off if the patient was determined to be healthy.
-    LOST_CONNECTION      // Simulate losing connection.
+    OFF,               // Device is off.
+    SELF_TEST_SUCCESS, // Self test passed.
+    SELF_TEST_FAIL,    // Self test failed.
+    CHANGE_BATTERIES,  // Change batteries.
+    STAY_CALM,         // Stay calm.
+    CHECK_RESPONSE,    // Check for response.
+    CALL_HELP,         // Call for help.
+    ATTACH_PADS,       // Attach pads.
+    ANALYZING,         // Don't touch patient. Analyzing.
+    SHOCK_ADVISED,     // Shock advised.
+    NO_SHOCK_ADVISED,  // No shock advised.
+    STAND_CLEAR,       // Stand clear.
+    SHOCKING,          // Shock will be delivered in three, two, one...
+    SHOCK_DELIVERED,   // Shock delivered.
+    CPR,               // Start CPR.
+    STOP_CPR,          // Stop CPR.
+    ABORT,             // Turn off if the patient was determined to be healthy.
+    LOST_CONNECTION    // Simulate losing connection.
 };
 
 // Specifies heart condition of the patient.
 enum HeartState
 {
-    SINUS_RHYTHM, // Normal sinus rhythm
+    SINUS_RHYTHM,             // Normal sinus rhythm
     VENTRICULAR_FIBRILLATION, // Ventricular fibrillation
-    VENTRICULAR_TACHYCARDIA, // Ventricular tachycardia
+    VENTRICULAR_TACHYCARDIA,  // Ventricular tachycardia
 };
 
 #endif
