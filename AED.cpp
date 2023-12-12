@@ -59,6 +59,8 @@ void AED::powerOn()
         return;
 
     run();
+
+    state = OFF;
 }
 
 /*
@@ -74,44 +76,31 @@ void AED::powerOff()
     if (state != OFF && state != ABORT && state != SHOCKING)
     {
         state = ABORT;
+
+        // Release all locks.
+        QMutexLocker padsLocker(&padsAttachedMutex);
+        waitForPadsAttachement.wakeOne();
+        QMutexLocker reconnectionlocker(&restoreConnectionMutex);
+        waitForConnection.wakeOne();
     }
 }
 
-/*
-    Function: checkPadsAttached()
-    Purpose: Checks if the pads are attached to the patient.
-    Inputs:
-        None
-    Outputs:
-        None
-*/
-void AED::checkPadsAttached()
+bool AED::checkPadsAttached()
 {
     if (!padsAttached)
     {
-        if (state == ABORT)
-            return;
         // Cycle through the stages if the pads have not been attached.
-        nextStep(STAY_CALM, SLEEP, 0);
-
-        if (state == ABORT)
-            return;
-        nextStep(CHECK_RESPONSE, SLEEP, 0);
-
-        if (state == ABORT)
-            return;
-        nextStep(CALL_HELP, SLEEP, 0);
-
-        if (state == ABORT)
-            return;
+        if (!nextStep(STAY_CALM, SLEEP, 0)) return false;
+        if (!nextStep(CHECK_RESPONSE, SLEEP, 0)) return false;
+        if (!nextStep(CALL_HELP, SLEEP, 0)) return false;
         // Ask the user to attach the pads.
-        nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0);
+        if (!nextStep(ATTACH_PADS, ATTACH_PADS_TIME, 0)) return false;
 
         if (padsAttached)
         {
             // Keep the pads indicator message for some time.
             QThread::msleep(1000);
-            return;
+            return true;
         }
 
         QMutexLocker locker(&padsAttachedMutex);
@@ -126,6 +115,8 @@ void AED::checkPadsAttached()
     {
         QThread::msleep(CHECK_PADS_TIME);
     }
+
+    return true;
 }
 
 /*
@@ -172,9 +163,6 @@ void AED::checkConnection()
 */
 void AED::run()
 {
-    if (state == ABORT)
-        return;
-
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
 
@@ -182,24 +170,19 @@ void AED::run()
     int random = QRandomGenerator::global()->bounded(100);
     if (random >= 90)
     {
-        state = SELF_TEST_FAIL;
-        emit updateGUI(SELF_TEST_FAIL);
-        return;
+        if (!nextStep(SELF_TEST_FAIL, 0, 0)) return;
     }
     else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
     {
-        state = CHANGE_BATTERIES;
-        emit updateGUI(CHANGE_BATTERIES);
-        return;
+        if (!nextStep(CHANGE_BATTERIES, 0, 0)) return;
     }
     else
     {
-        nextStep(SELF_TEST_SUCCESS, SLEEP, 0);
+        if (!nextStep(SELF_TEST_SUCCESS, SLEEP, 0)) return;
     }
 
     // Start reducing the battery.
-
-    checkPadsAttached();
+    if (!checkPadsAttached()) return;
 
     // One extra round of CPR before delivering all shocks.
     if (startWithAsystole)
@@ -209,12 +192,9 @@ void AED::run()
 
     for (int i = 0; i <= shockUntilHealthy; ++i)
     {
-        if (state == ABORT)
-            return;
-        nextStep(ANALYZING, ANALYZING_TIME, 0);
+        if (!nextStep(ANALYZING, ANALYZING_TIME, 0)) return;
 
-        if (state == ABORT)
-            return;
+
         // Change patient to healthy once all shocks have been delivered.
         if (shockable() && i == shockUntilHealthy)
         {
@@ -223,50 +203,35 @@ void AED::run()
             emit updatePatientCondition(SINUS_RHYTHM);
         }
 
-        if (state == ABORT)
-            return;
         bool shockNeeded = shockable() && (i > 0 || !startWithAsystole);
-        emit updateGUI(shockNeeded ? SHOCK_ADVISED : NO_SHOCK_ADVISED);
-        QThread::msleep(SLEEP);
+        if (!nextStep(shockNeeded ? SHOCK_ADVISED : NO_SHOCK_ADVISED, SLEEP, 0)) return;
 
         // Normal rhythm. Turn off the device.
         if (!shockNeeded && patientHeartCondition == SINUS_RHYTHM)
         {
-            nextStep(ABORT, 0, 0);
-            return;
+           emit updateGUI(ABORT);
+           return;
         }
 
-        if (state == ABORT)
-            return;
         // Simulating connection lost.
         checkConnection();
 
         if (shockNeeded)
         {
-            if (state == ABORT)
-                return;
-
             // Check if we have enough battery.
             if (batteryLevel - batteryUnitsPerShock < SUFFICIENT_BATTERY_LEVEL)
             {
-                // Indicate the user to change battery
-                nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0);
-                // Then abort
-                nextStep(ABORT, 0, 0);
-                return;
+                // Indicate the user to change battery.
+                if (!nextStep(CHANGE_BATTERIES, CHANGE_BATTERIES_TIME, 0)) return;
             }
 
-            if (state == ABORT)
-                return;
-            nextStep(STAND_CLEAR, SLEEP, 0);
-            nextStep(SHOCKING, SHOCKING_TIME, 0);
-            nextStep(SHOCK_DELIVERED, SLEEP, batteryUnitsPerShock);
+            if (!nextStep(STAND_CLEAR, SLEEP, 0)) return;
+            if (!nextStep(SHOCKING, SHOCKING_TIME, 0)) return;
+            if (!nextStep(SHOCK_DELIVERED, SLEEP, batteryUnitsPerShock)) return;
         }
 
-        if (state == ABORT)
-            return;
-        nextStep(CPR, CPR_TIME, 0);
-        nextStep(STOP_CPR, SLEEP, 0);
+        if (!nextStep(CPR, CPR_TIME, 0)) return;
+        if (!nextStep(STOP_CPR, SLEEP, 0)) return;
     }
 }
 
@@ -296,10 +261,16 @@ void AED::setGUI(MainWindow *mainWindow)
         unsigned long sleepTime: The time to sleep before the next step.
         int batteryUsed: The amount of battery used for the next step.
     Outputs:
-        None
+        A boolean indicating whether the device has successfully proceeded 
+        to the final step. 
 */
-void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
+bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
+    if (this->state == ABORT)
+    {
+        return false;
+    };
+
     this->state = state;
     emit updateGUI(state);
 
@@ -315,10 +286,17 @@ void AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
         emit updateShockCount(shockCount);
     }
 
+    if (state == SELF_TEST_FAIL || state == CHANGE_BATTERIES)
+    {
+        return false;
+    }
+
     if (sleepTime != 0)
     {
         QThread::msleep(sleepTime);
     }
+
+    return true;
 }
 
 /*
