@@ -405,6 +405,9 @@ void MainWindow::resetElapsedTime()
     ui->elapsedTime->setText("00:00");
     ui->shockCount->setText("SHOCKS: 00");
 
+    timeUpdateCounter -> stop();
+    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
+
     QApplication::processEvents();
 }
 
