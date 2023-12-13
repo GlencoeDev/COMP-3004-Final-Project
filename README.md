@@ -49,12 +49,12 @@ Completed by:
 | Use Cases                    | Tobechi & Sean          |
 | Sequence Diagrams            | Oluwadamilola           |
 | Main Window Implementation   | Vasily & Khang          |
-| AED Implementation           | Oluwadamilola & Tobechi |
+| AED Defintion                | Oluwadamilola & Tobechi |
 | UML Diagram                  | Tobechi                 |
-| AED Logic Extension          | Vasily & Khang          |
-| Design Documentation         | Sean & Khang                    |
+| AED Implementation           | Vasily & Khang          |
+| Design Documentation         | Sean & Khang            |
 | State Diagram                | Tobechi                 |
-| Traceability Matrix          | Vasily                  |
+| Traceability Matrix          | Vasily & Sean           |
 | Video Presentation           | Oluwadamilola           |
 | Code Cleanup & Documentation | Oluwadamilola           |
 
