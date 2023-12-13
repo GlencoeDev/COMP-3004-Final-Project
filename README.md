@@ -1,4 +1,4 @@
-# COMP 3004 Final Project - Fall 2023
+# COMP 3004 Final Project (Team 31) - Fall 2023
 
 ## Project Description
 In this project we have designed and developed a software simulation of the AED Plus (Automated External Defibrillator Plus) system, a life-saving medical
@@ -52,9 +52,9 @@ Completed by:
 | AED Implementation           | Oluwadamilola & Tobechi |
 | UML Diagram                  | Tobechi                 |
 | AED Logic Extension          | Vasily & Khang          |
-| Design Documentation         | Sean & Khang                    |
+| Design Documentation         | Sean & Khang            |
 | State Diagram                | Tobechi                 |
-| Traceability Matrix          | Vasily                  |
+| Traceability Matrix          | Vasily & Sean and Khang |
 | Video Presentation           | Oluwadamilola           |
 | Code Cleanup & Documentation | Oluwadamilola           |
 
