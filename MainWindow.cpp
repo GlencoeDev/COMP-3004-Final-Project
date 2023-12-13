@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->changeBatteries->setEnabled(false);
     ui->reconnectBtn->setEnabled(false);
 
+    batteryUpdateTimer = new QTimer(this);
+    batteryUpdateTimer->setInterval(BATTERY_DRAIN_TIME);
+    connect(batteryUpdateTimer, &QTimer::timeout, this, &MainWindow::drainBatteryWhenIdle);
+
     // Set up timer for flashing step indicator.
     indicatorTimer = new QTimer(this);
     connect(indicatorTimer, &QTimer::timeout, this, [this]()
@@ -182,6 +186,18 @@ void MainWindow::turnOffAllIndicators()
     QCoreApplication::processEvents();
 }
 
+void MainWindow::drainBatteryWhenIdle()
+{
+    if (device != nullptr)
+    {
+        int currentBatteryLevel = device->getBatteryLevel();
+        int batteryWhenIdle = ui->batteryWhenIdle->value();
+        currentBatteryLevel -= batteryWhenIdle;
+        device->setBatteryLevel(currentBatteryLevel);
+        updateBatteryLevel(currentBatteryLevel);
+    }
+}
+
 /*
     Function: MainWindow::on_powerBtn_toggled(bool checked)
     Purpose: Turn on/off the AED device.
@@ -219,13 +235,16 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Start the AED thread.
         emit powerOn();
 
+        // Start battery update indicator.
+        batteryUpdateTimer->start();
+
         ui->powerBtn->blockSignals(true);
         ui->powerBtn->setChecked(true);
         ui->powerBtn->blockSignals(false);
 
         // Reset timer and remove event listeners.
         disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
-        timeUpdateCounter->start();
+        timeUpdateCounter->start(1000);
     }
     else
     {
@@ -250,6 +269,8 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         timeUpdateCounter->stop();
         disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
 
+        batteryUpdateTimer->stop();
+
         turnOffAllIndicators();
         setTextMsg("");
         currentStep = -1;
@@ -271,6 +292,8 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         ui->padsAttachedIndicator->setChecked(false);
         device->setPadsAttached(false);
+
+        ui->startWithAsystole->setChecked(false);
 
         // Disable pads selector.
         ui->padsSelector->setEnabled(true);
@@ -380,15 +403,6 @@ void MainWindow::updateElapsedTime()
     // Set the timer label.
     QString timerStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui->elapsedTime->setText(timerStr);
-
-    // Decrease battery.
-    int currentBatteryLevel = ui->startingBatteryLevel->value();
-    int batteryWhenIdle = ui->batteryWhenIdle->value();
-    currentBatteryLevel -= batteryWhenIdle;
-    device->setBatteryLevel(currentBatteryLevel);
-    updateBatteryLevel(currentBatteryLevel);
-
-    // QApplication::processEvents();
 }
 
 /*
@@ -615,9 +629,10 @@ void MainWindow::updateGUI(int state)
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
-        QTimer::singleShot(2000, this, [this]()
-                           { this->ui->powerBtn->setChecked(false); });
-
+        QTimer::singleShot(2000, this, [this]() {
+            this->ui->powerBtn->setChecked(false);
+            this->device->setState(OFF);
+        });
         break;
 
     case SELF_TEST_SUCCESS:
@@ -723,6 +738,8 @@ void MainWindow::updateGUI(int state)
     case SHOCK_DELIVERED:
         turnOnIndicator(SHOCK_INDICATOR);
         setTextMsg("SHOCK DELIVERED");
+        // Decrease number of shocks.
+        ui->numOfRunsSelector->setValue(ui->numOfRunsSelector->value() - 1);
         break;
 
     case CPR:
@@ -848,6 +865,6 @@ void MainWindow::on_reconnectBtn_clicked()
 
     // Disable reconnectBtn.
     ui->reconnectBtn->setEnabled(false);
-    emit setLostConnection(true);
+    emit setLostConnection(false);
     device->notifyReconnection();
 }

@@ -1,5 +1,7 @@
 // IMPORTS
 #include "AED.h"
+#include "MainWindow.h"
+
 /*
     Function: AED()
     Purpose: Constructor for AED class. Initializes the AED device.
@@ -245,7 +247,7 @@ void AED::setGUI(MainWindow *mainWindow)
 {
     this->gui = mainWindow;
 
-    connect(this, SIGNAL(updateGUI(int)), mainWindow, SLOT(updateGUI(int)));
+    connect(this, SIGNAL(updateGUI(int)), gui, SLOT(updateGUI(int)));
     connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
     connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));

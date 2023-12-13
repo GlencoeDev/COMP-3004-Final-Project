@@ -14,7 +14,6 @@
 #define AED_H
 
 #include "defs.h"
-#include "MainWindow.h"
 
 class MainWindow;
 
@@ -87,6 +86,7 @@ private:
 
     QMutex restoreConnectionMutex;
     QWaitCondition waitForConnection;
+
 
     MainWindow *gui;
     std::unique_ptr<QThread> m_thread;
