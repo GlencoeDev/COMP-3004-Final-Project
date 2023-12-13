@@ -219,7 +219,9 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Start the AED thread.
         emit powerOn();
 
+        ui->powerBtn->blockSignals(true);
         ui->powerBtn->setChecked(true);
+        ui->powerBtn->blockSignals(false);
 
         // Reset timer and remove event listeners.
         disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
@@ -227,15 +229,20 @@ void MainWindow::on_powerBtn_toggled(bool checked)
     }
     else
     {
-        if (device->getState() == OFF)
+        // A list of states during which we cannot turn off the device.
+        QList<AEDState> blockStates = { OFF, ABORT, SHOCKING, STAND_CLEAR, SHOCKING, SHOCK_DELIVERED };
+        if (blockStates.contains(device->getState()))
         {
+            ui->powerBtn->blockSignals(true);
+            ui->powerBtn->setChecked(true);
+            ui->powerBtn->blockSignals(false);
             return;
         }
         else
         {
             // Stop the thread.
             // Ensure that the AED thread is running.
-            emit device->powerOff();
+            device->powerOff();
             QThread::msleep(100);
         }
 
@@ -245,6 +252,10 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         turnOffAllIndicators();
         setTextMsg("");
+        currentStep = -1;
+
+        // Remove ECG waveforms.
+        ui->ecgDisplay->clear();
 
         // Enable the patient condition selectors.
         ui->conditionSelector->setEnabled(true);
@@ -252,10 +263,14 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         toggleBatteryUnitControls(true);
 
         ui->cprPadsAttached->setChecked(false);
+
         ui->cprPadsAttached->setEnabled(true);
         ui->padsIndicator->setChecked(false);
 
         ui->selfCheckIndicator->setChecked(false);
+
+        ui->padsAttachedIndicator->setChecked(false);
+        device->setPadsAttached(false);
 
         // Disable pads selector.
         ui->padsSelector->setEnabled(true);
@@ -263,9 +278,9 @@ void MainWindow::on_powerBtn_toggled(bool checked)
         // Re-enable loss connection selector.
         ui->connectionLoss->setEnabled(true);
 
+        ui->powerBtn->blockSignals(true);
         ui->powerBtn->setChecked(false);
-
-        device->setState(OFF);
+        ui->powerBtn->blockSignals(false);
 
         // Set up a reset timer.
         connect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
@@ -373,7 +388,7 @@ void MainWindow::updateElapsedTime()
     device->setBatteryLevel(currentBatteryLevel);
     updateBatteryLevel(currentBatteryLevel);
 
-    QApplication::processEvents();
+    // QApplication::processEvents();
 }
 
 /*
@@ -389,6 +404,9 @@ void MainWindow::resetElapsedTime()
     elapsedTimeSec = 0;
     ui->elapsedTime->setText("00:00");
     ui->shockCount->setText("SHOCKS: 00");
+
+    timeUpdateCounter -> stop();
+    disconnect(timeUpdateCounter, &QTimer::timeout, this, &MainWindow::resetElapsedTime);
 
     QApplication::processEvents();
 }
@@ -597,9 +615,13 @@ void MainWindow::updateGUI(int state)
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
-        QTimer::singleShot(2000, this, [this]()
-                           { this->ui->powerBtn->setChecked(false); });
 
+        //Disable the powerButton, for a little bit.
+        ui -> powerBtn -> setDisabled(true);
+        QTimer::singleShot(2000, this, [this](){
+            ui -> powerBtn -> setEnabled(true);
+            this -> on_powerBtn_toggled(false);
+        });
         break;
 
     case SELF_TEST_SUCCESS:
@@ -623,6 +645,12 @@ void MainWindow::updateGUI(int state)
 
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
+
+        ui -> powerBtn -> setDisabled(true);
+        QTimer::singleShot(2000, this, [this](){
+            ui -> powerBtn -> setEnabled(true);
+            this -> on_powerBtn_toggled(false);
+        });
         break;
 
     case STAY_CALM:
@@ -723,18 +751,10 @@ void MainWindow::updateGUI(int state)
         break;
 
     case ABORT:
-        setTextMsg("");
-
         // Turn off the device.
-        ui->powerBtn->toggle();
-        ui->selfCheckIndicator->setEnabled(false);
-
-        // Turn off all indicators
-        turnOffAllIndicators();
-
-        // Remove ECG waveforms.
-        ui->ecgDisplay->clear();
-        break;
+        ui->powerBtn->setChecked(false);
+        device->setState(OFF);
+    break;
 
     default:
         setTextMsg("");

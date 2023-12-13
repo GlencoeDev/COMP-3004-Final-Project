@@ -61,10 +61,10 @@ signals:
     void updatePatientCondition(int condition);
 
 private:
-    void nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
+    bool nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
     void run();
-    void checkPadsAttached();
+    bool checkPadsAttached();
     void checkConnection();
 
     HeartState patientHeartCondition;
