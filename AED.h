@@ -60,6 +60,7 @@ signals:
     void updatePatientCondition(int condition);
 
 private:
+    bool selfTest();
     bool nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
     void run();

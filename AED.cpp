@@ -154,6 +154,34 @@ void AED::checkConnection()
 }
 
 /*
+    Function: seltTest()
+    Purpose: Conducts self-test of the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
+bool AED::selfTest()
+{
+    // Randomly determine whether the self-test should fail.
+    int random = QRandomGenerator::global()->bounded(100);
+    if (random >= 90)
+    {
+        if (!nextStep(SELF_TEST_FAIL, 0, 0)) return false;
+    }
+    else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+    {
+        if (!nextStep(CHANGE_BATTERIES, 0, 0)) return false;
+    }
+    else
+    {
+        if (!nextStep(SELF_TEST_SUCCESS, SLEEP, 0)) return false;
+    }
+
+    return true;
+}
+
+/*
     Function: run()
     Purpose: Runs the AED device.
     Inputs:
@@ -166,20 +194,7 @@ void AED::run()
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
 
-    // Randomly determine whether the self-test should fail.
-    int random = QRandomGenerator::global()->bounded(100);
-    if (random >= 90)
-    {
-        if (!nextStep(SELF_TEST_FAIL, 0, 0)) return;
-    }
-    else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
-    {
-        if (!nextStep(CHANGE_BATTERIES, 0, 0)) return;
-    }
-    else
-    {
-        if (!nextStep(SELF_TEST_SUCCESS, SLEEP, 0)) return;
-    }
+    if (!selfTest()) return;
 
     // Start reducing the battery.
     if (!checkPadsAttached()) return;
