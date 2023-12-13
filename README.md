@@ -53,7 +53,7 @@ Completed by:
 | UML Diagram                  | Tobechi                 |
 | AED Logic Extension          | Vasily & Khang          |
 | Design Documentation         | Sean & Khang            |
-| State Diagram                | Tobechi                 |
+| State Diagram                | Tobechi & Sean              |
 | Traceability Matrix          | Vasily & Sean and Khang |
 | Video Presentation           | Oluwadamilola           |
 | Code Cleanup & Documentation | Oluwadamilola           |
