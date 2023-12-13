@@ -14,7 +14,6 @@
 #define AED_H
 
 #include "defs.h"
-#include "MainWindow.h"
 
 class MainWindow;
 
@@ -61,6 +60,7 @@ signals:
     void updatePatientCondition(int condition);
 
 private:
+    bool selfTest();
     bool nextStep(AEDState state, unsigned long sleepTime, int batteryUsed);
     bool shockable() const;
     void run();
@@ -87,6 +87,7 @@ private:
 
     QMutex restoreConnectionMutex;
     QWaitCondition waitForConnection;
+
 
     MainWindow *gui;
     std::unique_ptr<QThread> m_thread;

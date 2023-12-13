@@ -59,7 +59,6 @@ signals:
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void terminate();
     void powerOn();
-    void powerOff();
     void setLostConnection(bool simulateConnectionLoss);
     void notifyReconnection();
     void setState(int state);
@@ -90,6 +89,8 @@ private:
     void updateECGDisplay(HeartState state);
     void updateECGDisplay(const QString &image);
 
+    void drainBatteryWhenIdle();
+
     // Keep a list of the indicators shoing current AED operation step.
     QList<QPushButton *> stepIndicators;
 
@@ -98,6 +99,7 @@ private:
     // Used to update the elapsed time.
     QTimer *timeUpdateCounter;
     QTimer *indicatorTimer;
+    QTimer *batteryUpdateTimer;
 
     // Saves elapsed time.
     int elapsedTimeSec;

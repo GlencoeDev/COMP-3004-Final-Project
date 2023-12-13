@@ -22,6 +22,7 @@
 #define CONTACT_INDICATOR 3
 #define CPR_INDICATOR 4
 #define SHOCK_INDICATOR 5
+#define BATTERY_DRAIN_TIME 5000
 
 #define RANDOM_BOUND 1
 // Device state.

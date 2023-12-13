@@ -1,5 +1,7 @@
 // IMPORTS
 #include "AED.h"
+#include "MainWindow.h"
+
 /*
     Function: AED()
     Purpose: Constructor for AED class. Initializes the AED device.
@@ -152,6 +154,34 @@ void AED::checkConnection()
 }
 
 /*
+    Function: seltTest()
+    Purpose: Conducts self-test of the AED device.
+    Inputs:
+        None
+    Outputs:
+        None
+*/
+bool AED::selfTest()
+{
+    // Randomly determine whether the self-test should fail.
+    int random = QRandomGenerator::global()->bounded(100);
+    if (random >= 90)
+    {
+        if (!nextStep(SELF_TEST_FAIL, 0, 0)) return false;
+    }
+    else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+    {
+        if (!nextStep(CHANGE_BATTERIES, 0, 0)) return false;
+    }
+    else
+    {
+        if (!nextStep(SELF_TEST_SUCCESS, SLEEP, 0)) return false;
+    }
+
+    return true;
+}
+
+/*
     Function: run()
     Purpose: Runs the AED device.
     Inputs:
@@ -164,20 +194,7 @@ void AED::run()
     // Start self test procedure, only checking for battery in this case
     QThread::msleep(SLEEP);
 
-    // Randomly determine whether the self-test should fail.
-    int random = QRandomGenerator::global()->bounded(100);
-    if (random >= 90)
-    {
-        if (!nextStep(SELF_TEST_FAIL, 0, 0)) return;
-    }
-    else if (batteryLevel < SUFFICIENT_BATTERY_LEVEL)
-    {
-        if (!nextStep(CHANGE_BATTERIES, 0, 0)) return;
-    }
-    else
-    {
-        if (!nextStep(SELF_TEST_SUCCESS, SLEEP, 0)) return;
-    }
+    if (!selfTest()) return;
 
     // Start reducing the battery.
     if (!checkPadsAttached()) return;
@@ -245,7 +262,7 @@ void AED::setGUI(MainWindow *mainWindow)
 {
     this->gui = mainWindow;
 
-    connect(this, SIGNAL(updateGUI(int)), mainWindow, SLOT(updateGUI(int)));
+    connect(this, SIGNAL(updateGUI(int)), gui, SLOT(updateGUI(int)));
     connect(this, SIGNAL(batteryChanged(int)), gui, SLOT(updateBatteryLevel(int)));
     connect(this, SIGNAL(updateShockCount(int)), gui, SLOT(updateNumberOfShocks(int)));
     connect(this, SIGNAL(updatePatientCondition(int)), gui, SLOT(updatePatientCondition(int)));
@@ -264,10 +281,11 @@ void AED::setGUI(MainWindow *mainWindow)
 */
 bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
-    //Need to check this first before this -> state == ABORT, just for the case that the device self test fail two times in the row.
-    if(state == SELF_TEST_FAIL || state == CHANGE_BATTERIES){
-        this -> state = state;
-        emit updateGUI(state);
+    //Check for change batteries state first before proceeding
+    if (state == CHANGE_BATTERIES)
+    {
+        this -> state = CHANGE_BATTERIES;
+        emit updateGUI(CHANGE_BATTERIES);
         return false;
     }
     if(this -> state == ABORT){
@@ -279,7 +297,12 @@ bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
     this->state = state;
     emit updateGUI(state);
 
+    if(state == SELF_TEST_FAIL){
+        return false;
+    }
 
+    if(batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+        return nextStep(CHANGE_BATTERIES, 0, 0);
 
     if (batteryUsed > 0)
     {
@@ -414,7 +437,7 @@ void AED::notifyPadsAttached()
 {
     padsAttached = true;
     QMutexLocker locker(&padsAttachedMutex);
-    waitForPadsAttachement.wakeOne();
+    waitForPadsAttachement.wakeOne();//Check for change batteries state first before proceeding
 }
 
 /*
