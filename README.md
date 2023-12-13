@@ -54,7 +54,7 @@ Completed by:
 | AED Implementation           | Vasily & Khang          |
 | Design Documentation         | Sean & Khang            |
 | State Diagram                | Tobechi                 |
-| Traceability Matrix          | Vasily & Sean and Khang |
+| Traceability Matrix          | Vasily & Sean           |
 | Video Presentation           | Oluwadamilola           |
 | Code Cleanup & Documentation | Oluwadamilola           |
 
