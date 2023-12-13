@@ -615,9 +615,13 @@ void MainWindow::updateGUI(int state)
     case SELF_TEST_FAIL:
         setTextMsg("UNIT FAILED");
         ui->selfCheckIndicator->setChecked(false);
-        QTimer::singleShot(2000, this, [this]()
-                           { this->ui->powerBtn->setChecked(false); });
 
+        //Disable the powerButton, for a little bit.
+        ui -> powerBtn -> setDisabled(true);
+        QTimer::singleShot(2000, this, [this](){
+            ui -> powerBtn -> setEnabled(true);
+            this -> on_powerBtn_toggled(false);
+        });
         break;
 
     case SELF_TEST_SUCCESS:
@@ -641,6 +645,12 @@ void MainWindow::updateGUI(int state)
 
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
+
+        ui -> powerBtn -> setDisabled(true);
+        QTimer::singleShot(2000, this, [this](){
+            ui -> powerBtn -> setEnabled(true);
+            this -> on_powerBtn_toggled(false);
+        });
         break;
 
     case STAY_CALM:
