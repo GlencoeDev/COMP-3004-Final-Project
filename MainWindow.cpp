@@ -103,7 +103,6 @@ void MainWindow::addAED(AED *device)
     connect(this, SIGNAL(notifyPadsAttached()), device, SLOT(notifyPadsAttached()));
     connect(this, SIGNAL(setBatterySpecs(int, int, int)), device, SLOT(setBatterySpecs(int, int, int)));
     connect(this, &MainWindow::powerOn, device, &AED::powerOn);
-    connect(this, &MainWindow::powerOff, device, &AED::powerOff);
     connect(this, &MainWindow::notifyReconnection, device, &AED::notifyReconnection);
     connect(this, &MainWindow::setLostConnection, device, &AED::setLostConnection);
 }

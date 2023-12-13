@@ -59,7 +59,6 @@ signals:
     void setBatterySpecs(int startingLevel, int unitsPerShock, int unitsWhenIdle);
     void terminate();
     void powerOn();
-    void powerOff();
     void setLostConnection(bool simulateConnectionLoss);
     void notifyReconnection();
     void setState(int state);
@@ -100,7 +99,7 @@ private:
     // Used to update the elapsed time.
     QTimer *timeUpdateCounter;
     QTimer *indicatorTimer;
-    QTimer* batteryUpdateTimer;
+    QTimer *batteryUpdateTimer;
 
     // Saves elapsed time.
     int elapsedTimeSec;
