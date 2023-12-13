@@ -655,6 +655,13 @@ void MainWindow::updateGUI(int state)
 
         // Enable the button for switching batteries;
         ui->changeBatteries->setEnabled(true);
+
+        QTimer::singleShot(2000, this, [this]() {
+            this -> ui->selfCheckIndicator->setChecked(false);
+            this -> ui -> powerBtn -> setChecked(false);
+            this -> device -> setState(OFF);
+        });
+
         break;
 
     case STAY_CALM:

@@ -281,6 +281,13 @@ void AED::setGUI(MainWindow *mainWindow)
 */
 bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
+    if (state == CHANGE_BATTERIES)
+    {
+        this -> state = CHANGE_BATTERIES;
+        emit updateGUI(CHANGE_BATTERIES);
+        return false;
+    }
+
     if (this->state == ABORT)
     {
         emit updateGUI(ABORT);
@@ -289,6 +296,13 @@ bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 
     this->state = state;
     emit updateGUI(state);
+
+    if(state == SELF_TEST_FAIL){
+        return false;
+    }
+
+    if(batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+        return nextStep(CHANGE_BATTERIES, 0, 0);
 
     if (batteryUsed > 0)
     {
@@ -302,10 +316,7 @@ bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
         emit updateShockCount(shockCount);
     }
 
-    if (state == SELF_TEST_FAIL || state == CHANGE_BATTERIES)
-    {
-        return false;
-    }
+
 
     if (sleepTime != 0)
     {
