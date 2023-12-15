@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include <QMovie>
 
 /*
     Function: MainWindow(QWidget *parent)
@@ -217,6 +218,11 @@ void MainWindow::on_powerBtn_toggled(bool checked)
 
         // Disable loss connection selector.
         ui->connectionLoss->setEnabled(false);
+
+        if (ui->cprPadsAttached->isChecked())
+        {
+            ui->cprPadsAttached->setEnabled(false);
+        }
 
         // Disable pads selector.
         ui->padsSelector->setEnabled(false);
@@ -572,11 +578,11 @@ void MainWindow::setPatientCondition()
     Output:
         None
 */
-void MainWindow::updateECGDisplay(const QString &image)
+void MainWindow::updateECGDisplay(const QString &animation)
 {
-    QPixmap pixmap;
-    pixmap.load(image);
-    ui->ecgDisplay->setPixmap(pixmap);
+    QMovie* sinusAnimation = new QMovie(animation);
+    ui->ecgDisplay->setMovie(sinusAnimation);
+    sinusAnimation->start();
 }
 
 /*
@@ -592,15 +598,18 @@ void MainWindow::updateECGDisplay(HeartState state)
     switch (state)
     {
     case SINUS_RHYTHM:
-        updateECGDisplay(QString("://Icons/ECG_SINUS.png"));
+        updateECGDisplay("://Icons/sinus_animation.gif");
         break;
 
     case VENTRICULAR_FIBRILLATION:
-        updateECGDisplay(QString("://Icons/ventricullar_fibrillation.png"));
+        updateECGDisplay("://Icons/ventricullar_fibrillation_animation.gif");
         break;
 
     case VENTRICULAR_TACHYCARDIA:
-        updateECGDisplay(QString("://Icons/ventricular_tachycardia.png"));
+        updateECGDisplay("://Icons/ventricular_tachycardia_animation.gif");
+        break;
+
+    default:
         break;
     }
 }
@@ -715,11 +724,11 @@ void MainWindow::updateGUI(int state)
         if (ui->startWithAsystole->isChecked() &&
             device->getPatientHeartCondition() != SINUS_RHYTHM)
         {
-            updateECGDisplay("://Icons/asystole.png");
+            updateECGDisplay("://Icons/asystole_animation.gif");
         }
         else
         {
-            updateECGDisplay("://Icons/ECG_SINUS.png");
+            updateECGDisplay(SINUS_RHYTHM);
         }
         break;
 
@@ -817,27 +826,24 @@ void MainWindow::on_cprPadsAttached_clicked(bool checked)
     ui->cprPadsAttached->setChecked(checked);
     ui->padsAttachedIndicator->setChecked(checked);
 
+    if (device->getState() > OFF && checked)
+    {
+        // Disable selector once the pads were attached.
+        ui->cprPadsAttached->setEnabled(false);
+    }
+
     if (device->getState() <= ATTACH_PADS && checked)
     {
-        if (device->getState() > OFF)
-        {
-            // Disable selector once the pads were attached.
-            ui->cprPadsAttached->setEnabled(false);
-        }
 
         if (device->getState() == ATTACH_PADS)
         {
             // Display the kind of pads that were attached.
             bool adultPads = ui->padsSelector->currentIndex() == 0;
             setTextMsg(QString("%1 PADS").arg(adultPads ? "ADULT" : "PEDIATRIC"));
+        }
 
-            // Operator is attaching the pads to the patient.
-            device->notifyPadsAttached();
-        }
-        else
-        {
-            device->notifyPadsAttached();
-        }
+        // Operator is attaching the pads to the patient.
+        device->notifyPadsAttached();
     }
 }
 

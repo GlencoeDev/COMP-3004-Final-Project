@@ -105,7 +105,7 @@ border-top-right-radius: 5px;</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background: #d2d3d4;
+       <string notr="true">background: #cccbce;
 border: 2px solid #8a8f9e;
 border-radius: 10px;
 margin: 0;</string>
@@ -291,8 +291,7 @@ border-radius: 0;</string>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">border:0;
-background-image: url(/ICONS/ECG_SINUS.png)</string>
+        <string notr="true">border: 0;</string>
        </property>
        <property name="text">
         <string/>

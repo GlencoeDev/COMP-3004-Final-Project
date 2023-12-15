@@ -88,7 +88,6 @@ private:
     QMutex restoreConnectionMutex;
     QWaitCondition waitForConnection;
 
-
     MainWindow *gui;
     std::unique_ptr<QThread> m_thread;
 };

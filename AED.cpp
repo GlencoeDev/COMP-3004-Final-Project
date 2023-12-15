@@ -209,7 +209,6 @@ void AED::run()
     {
         if (!nextStep(ANALYZING, ANALYZING_TIME, 0)) return;
 
-
         // Change patient to healthy once all shocks have been delivered.
         if (shockable() && i == shockUntilHealthy)
         {

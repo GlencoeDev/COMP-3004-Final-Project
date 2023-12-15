@@ -17,5 +17,9 @@
         <file>Icons/asystole.png</file>
         <file>Icons/ventricullar_fibrillation.png</file>
         <file>Icons/ventricular_tachycardia.png</file>
+        <file>Icons/sinus_animation.gif</file>
+        <file>Icons/asystole_animation.gif</file>
+        <file>Icons/ventricular_tachycardia_animation.gif</file>
+        <file>Icons/ventricullar_fibrillation_animation.gif</file>
     </qresource>
 </RCC>
