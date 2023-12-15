@@ -14,7 +14,7 @@ Completed by:
 ## Project Structure
 ```
 .
-├── AED
+├── Code
 │   ├── /Icons
 │   ├── .gitignore
 │   ├── AED.cpp
@@ -27,6 +27,16 @@ Completed by:
 │   ├── MainWindow.h
 │   ├── MainWindow.ui
 │   ├── Resources.qrc
+├── Diagrams
+│   ├── /Sequence Diagrams
+│       ├── Resuscitating Patient with Ventricular Fibrillation.svg
+│       ├── Resuscitating Patient with Ventricular Tachycardia and Asystole.svg
+│       ├── Shock Delivered.svg
+│       ├── Self Test.svg
+│   ├── AED State Diagram.svg
+│   ├── UML Diagram.svg
+|   ├── Use Case Diagram.svg
+├── COMP 3004 - Final Project (Team 31) Report.pdf
 ```
 
 # 
@@ -54,7 +64,7 @@ Completed by:
 | AED Implementation           | Vasily & Khang          |
 | Design Documentation         | Sean & Khang            |
 | State Diagram                | Tobechi                 |
-| Traceability Matrix          | Vasily & Sean and Khang |
+| Traceability Matrix          | Vasily & Sean           |
 | Video Presentation           | Oluwadamilola           |
 | Code Cleanup & Documentation | Oluwadamilola           |
 
