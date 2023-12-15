@@ -280,18 +280,18 @@ void AED::setGUI(MainWindow *mainWindow)
 */
 bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
 {
+    //Check for change batteries state first before proceeding
     if (state == CHANGE_BATTERIES)
     {
         this -> state = CHANGE_BATTERIES;
         emit updateGUI(CHANGE_BATTERIES);
         return false;
     }
-
-    if (this->state == ABORT)
-    {
+    if(this -> state == ABORT){
         emit updateGUI(ABORT);
         return false;
-    };
+    }
+
 
     this->state = state;
     emit updateGUI(state);
@@ -315,7 +315,8 @@ bool AED::nextStep(AEDState state, unsigned long sleepTime, int batteryUsed)
         emit updateShockCount(shockCount);
     }
 
-
+    if(batteryLevel < SUFFICIENT_BATTERY_LEVEL)
+        return nextStep(CHANGE_BATTERIES, 0, 0);
 
     if (sleepTime != 0)
     {
@@ -435,7 +436,7 @@ void AED::notifyPadsAttached()
 {
     padsAttached = true;
     QMutexLocker locker(&padsAttachedMutex);
-    waitForPadsAttachement.wakeOne();
+    waitForPadsAttachement.wakeOne();//Check for change batteries state first before proceeding
 }
 
 /*
