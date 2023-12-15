@@ -3,7 +3,7 @@
 
 // Qt imports
 #include <QMainWindow>
-#include <QPushButton>>
+#include <QPushButton>
 #include <QTimer>
 #include <QList>
 #include <QThread>
